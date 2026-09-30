@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hifz Companion">
+<meta name="theme-color" content="#0d6b5f">
+<title>Quran Hifz Companion — V2</title>
+<style>
+:root{--bg:#f4f7f5;--card:#fff;--ink:#12211d;--muted:#66736f;--green:#0d6b5f;--green2:#0a5148;--gold:#b7791f;--red:#b42318;--blue:#315c9b;--line:#dce6e2;--shadow:0 7px 24px rgba(18,33,29,.07)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+header{padding:calc(env(safe-area-inset-top) + 17px) 17px 14px;background:linear-gradient(140deg,#0a5148,#0d806f);color:white;position:sticky;top:0;z-index:20}
+h1{font-size:24px;margin:0 0 3px}header p{margin:0;font-size:12px;opacity:.9}
+nav{display:flex;gap:7px;overflow:auto;padding:9px 11px;background:#fff;position:sticky;top:82px;z-index:19;border-bottom:1px solid var(--line)}
+nav button{border:0;background:#edf4f1;padding:9px 12px;border-radius:999px;white-space:nowrap;color:var(--ink);font-weight:700}
+nav button.active{background:var(--green);color:#fff}
+main{max-width:780px;margin:auto;padding:12px 13px 95px}section{display:none}section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin:10px 0;box-shadow:var(--shadow)}
+.hero{background:linear-gradient(145deg,#e4f3ef,#fff);border:0}.kicker{text-transform:uppercase;letter-spacing:.08em;color:var(--green2);font-size:11px;font-weight:900}
+.big{font-size:30px;font-weight:850;margin:5px 0}.muted{color:var(--muted);font-size:13px}.small{font-size:11px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{background:#f7faf9;border-radius:14px;padding:12px}.stat b{display:block;font-size:21px;margin-top:2px}
+.progress{height:10px;background:#e5eeeb;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:var(--green);transition:.35s}
+button{font:inherit;cursor:pointer}.primary{background:var(--green);color:#fff;border:0;border-radius:12px;padding:11px 13px;font-weight:800}.secondary{background:#edf4f1;color:var(--green2);border:0;border-radius:12px;padding:10px 12px;font-weight:750}.danger{background:#fff0ef;color:var(--red);border:0;border-radius:12px;padding:10px 12px;font-weight:750}
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;font:inherit;background:white}textarea{min-height:105px;direction:rtl;text-align:right;line-height:2}
+.item{display:flex;gap:9px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}
+.badge{font-size:10px;padding:5px 8px;border-radius:99px;background:#eaf5f1;color:var(--green2);font-weight:800}.today{outline:2px solid var(--green);border-radius:13px;padding:9px!important;margin:4px 0}
+.pill-good{background:#e8f5ed;color:#17663c}.pill-warn{background:#fff5df;color:#8a5a00}.pill-bad{background:#fff0ef;color:#a42318}
+.score{font-size:35px;font-weight:900}.center{text-align:center}.hidden{display:none!important}
+details{border:1px solid var(--line);border-radius:13px;padding:10px;margin:8px 0;background:#fafcfb}summary{font-weight:800;cursor:pointer}
+#recText{font-size:20px;line-height:2.1}.word{padding:2px 3px;border-radius:5px}.missing{background:#ffd9d5;color:#9b2118}.extra{background:#fff0bf;color:#765000}
+footer{text-align:center;color:var(--muted);font-size:10px;padding:12px}
+</style>
+</head>
+<body>
+<header><h1>Quran Hifz Companion</h1><p>V2 • October 2026 • Pakistani 15-Line Mushaf • P1/Al-Fatihah excluded</p></header>
+<nav>
+<button class="active" onclick="showTab('home',this)">Today</button>
+<button onclick="showTab('schedule',this)">Plan</button>
+<button onclick="showTab('practice',this)">Recite</button>
+<button onclick="showTab('revision',this)">Revision</button>
+<button onclick="showTab('stats',this)">Progress</button>
+</nav>
+<main>
+
+<section id="home" class="active">
+<div class="card hero">
+<div class="kicker">Today's mission</div>
+<div id="dateLabel" class="muted"></div>
+<div id="target" class="big"></div>
+<div id="plan" class="muted"></div>
+<div style="height:11px"></div><div class="progress"><div id="todayProgress" class="bar"></div></div>
+<p id="completionLabel" class="small"></p>
+<div class="row">
+<button class="primary" onclick="toggleToday()">✓ Complete today's target</button>
+<button class="secondary" onclick="goPractice()">🎙 Recite</button>
+</div>
+</div>
+<div class="grid">
+<div class="stat"><span class="muted">Plan days done</span><b id="done"></b></div>
+<div class="stat"><span class="muted">Current streak</span><b id="streak"></b></div>
+<div class="stat"><span class="muted">Progress</span><b id="pct"></b></div>
+<div class="stat"><span class="muted">Weak lines</span><b id="weakN"></b></div>
+</div>
+<div class="card">
+<div class="kicker">5-minute closed-Mushaf test</div>
+<p>Close the Mushaf and recite today's portion. Mark the result honestly.</p>
+<div class="row">
+<button class="primary" onclick="testResult('strong')">✓ Strong</button>
+<button class="secondary" onclick="testResult('okay')">~ Needs work</button>
+<button class="danger" onclick="testResult('weak')">✕ Weak</button>
+</div>
+<div id="testMsg" class="small" style="margin-top:8px"></div>
+</div>
+<div class="card">
+<div class="kicker">Recommended routine</div>
+<p><b>15 min</b> new lesson + <b>15 min</b> recent revision + <b>10 min</b> older revision + <b>5 min</b> closed-Mushaf test.</p>
+<p class="muted">If recall repeatedly falls below roughly 80–90%, reduce new memorization and protect revision.</p>
+</div>
+</section>
+
+<section id="schedule">
+<div class="card"><h2>October 2026 Plan</h2><p class="muted">P2 = 6 lines on 1 Oct. P3 onward = 15 lines/page, with 5 new lines on each new-lesson day.</p></div>
+<div id="scheduleList" class="card"></div>
+</section>
+
+<section id="practice">
+<div class="card">
+<div class="kicker">Recitation checker</div><h2>Listen → Recite → Compare</h2>
+<p class="muted">Paste the exact Arabic lesson text. The app can speak it, listen to your recitation, and compare the browser's recognized words. This is a practice aid—not a Tajweed or teacher-level verifier.</p>
+<textarea id="refText" placeholder="الصق نص الدرس العربي هنا…"></textarea>
+<div class="row" style="margin-top:8px">
+<button class="primary" onclick="speak()">🔊 Listen</button><button class="secondary" onclick="stopSpeak()">■ Stop</button>
+<button class="primary" onclick="startRec()">🎙 Start</button><button class="secondary" onclick="stopRec()">Stop</button>
+</div>
+<div id="listenStatus" class="small" style="margin-top:8px"></div>
+<div id="recText" class="card hidden"></div>
+<div id="compareBox" class="card hidden"></div>
+</div>
+<div class="card">
+<div class="kicker">Lesson audio</div><h3>Use your preferred reliable reciter</h3>
+<p class="muted">Paste an audio URL for the exact lesson. It is saved on this device for quick replay.</p>
+<input id="audioUrl" placeholder="https://…/lesson.mp3">
+<div class="row" style="margin-top:8px"><button class="primary" onclick="saveAudio()">Save audio</button><button class="secondary" onclick="playAudio()">▶ Play</button></div>
+<audio id="player" controls style="width:100%;margin-top:10px"></audio>
+</div>
+<div class="card">
+<div class="kicker">Mistake log</div><p class="muted">Log a weak page/line. Repeated mistakes get a higher revision priority.</p>
+<div class="row"><input id="weakInput" placeholder="e.g. P3 L7"><select id="severity"><option value="1">Minor</option><option value="2">Repeated</option><option value="3">Very weak</option></select><button class="primary" onclick="addWeak()">Add</button></div>
+<div id="weakList"></div>
+</div>
+</section>
+
+<section id="revision">
+<div class="card">
+<div class="kicker">Smart revision queue</div><h2>What should I revise?</h2>
+<p class="muted">The queue combines your schedule, weak-line history, and recent test results. It deliberately favors revision when accuracy is weak.</p>
+<div id="queue"></div>
+</div>
+<div class="card">
+<h3>Quick review checklist</h3>
+<div id="checklist"></div>
+</div>
+</section>
+
+<section id="stats">
+<div class="card center"><div class="kicker">Overall completion</div><div class="score" id="score"></div><div class="progress"><div id="overall" class="bar"></div></div><p id="scoreText" class="muted"></p></div>
+<div class="grid">
+<div class="stat"><span class="muted">Strong tests</span><b id="strong"></b></div>
+<div class="stat"><span class="muted">Needs work</span><b id="okay"></b></div>
+<div class="stat"><span class="muted">Weak tests</span><b id="weakTests"></b></div>
+<div class="stat"><span class="muted">Logged mistakes</span><b id="mistakes"></b></div>
+</div>
+<div class="card">
+<h3>Progress backup</h3>
+<div class="row"><button class="secondary" onclick="exportData()">Export JSON</button><button class="secondary" onclick="document.getElementById('importFile').click()">Import JSON</button><input id="importFile" type="file" accept=".json" class="hidden" onchange="importData(event)"></div>
+<p class="small">Keep a backup before clearing Safari data or changing devices.</p>
+</div>
+<div class="card">
+<details><summary>App settings</summary>
+<label class="small">Daily target note</label><input id="dailyNote" placeholder="e.g. Focus on fluency today">
+<button class="primary" style="margin-top:8px" onclick="saveNote()">Save note</button>
+<p class="small">Data is stored locally in this browser. No account is required.</p>
+</details>
+<details><summary>Teacher / parent test mode</summary>
+<p class="muted">Hand over the phone with the Mushaf closed. The tester can mark Strong / Needs work / Weak without changing the lesson target.</p>
+</details>
+</div>
+</section>
+
+<footer>Consistency matters more than quota. Use one Mushaf consistently and have a qualified teacher/Hafiz verify difficult recitation.</footer>
+</main>
+
+<script>
+const schedule = [['2026-10-01','Thu','P2 L1–6','New lesson','P2'],['2026-10-02','Fri','—','Revision — P2',''],['2026-10-03','Sat','P3 L1–5','New lesson','P3'],['2026-10-04','Sun','P3 L6–10','New lesson','P3'],['2026-10-05','Mon','P3 L11–15','New lesson','P3'],['2026-10-06','Tue','P4 L1–5','New lesson','P4'],['2026-10-07','Wed','P4 L6–10','New lesson','P4'],['2026-10-08','Thu','P4 L11–15','New lesson','P4'],['2026-10-09','Fri','—','Revision / Test — P2–P4',''],['2026-10-10','Sat','P5 L1–5','New lesson','P5'],['2026-10-11','Sun','P5 L6–10','New lesson','P5'],['2026-10-12','Mon','P5 L11–15','New lesson','P5'],['2026-10-13','Tue','P6 L1–5','New lesson','P6'],['2026-10-14','Wed','P6 L6–10','New lesson','P6'],['2026-10-15','Thu','P6 L11–15','New lesson','P6'],['2026-10-16','Fri','—','Revision / Test — P2–P6',''],['2026-10-17','Sat','P7 L1–5','New lesson','P7'],['2026-10-18','Sun','P7 L6–10','New lesson','P7'],['2026-10-19','Mon','P7 L11–15','New lesson','P7'],['2026-10-20','Tue','P8 L1–5','New lesson','P8'],['2026-10-21','Wed','P8 L6–10','New lesson','P8'],['2026-10-22','Thu','P8 L11–15','New lesson','P8'],['2026-10-23','Fri','—','Revision / Test — P2–P8',''],['2026-10-24','Sat','P9 L1–5','New lesson','P9'],['2026-10-25','Sun','P9 L6–10','New lesson','P9'],['2026-10-26','Mon','P9 L11–15','New lesson','P9'],['2026-10-27','Tue','P10 L1–5','New lesson','P10'],['2026-10-28','Wed','P10 L6–10','New lesson','P10'],['2026-10-29','Thu','P10 L11–15','New lesson','P10'],['2026-10-30','Fri','—','Monthly Test — P2–P10',''],['2026-10-31','Sat','—','Consolidation — P2–P10','']];
+const KEY='quran_hifz_v2';
+let S=JSON.parse(localStorage.getItem(KEY)||'{"done":{},"weak":[],"tests":{},"audio":{},"note":""}');
+function save(){localStorage.setItem(KEY,JSON.stringify(S));render();}
+function currentDate(){let d=new Date(), iso=d.toISOString().slice(0,10);return schedule.some(x=>x[0]===iso)?iso:'2026-10-01'}
+function row(d){return schedule.find(x=>x[0]===d)||schedule[0]}
+function showTab(id,btn){document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');render()}
+function goPractice(){showTab('practice',document.querySelectorAll('nav button')[2])}
+function toggleToday(){let d=currentDate();S.done[d]=!S.done[d];save()}
+function testResult(v){let d=currentDate();S.tests[d]=v;document.getElementById('testMsg').textContent=v==='strong'?'Strong recall recorded.':v==='okay'?'Needs work recorded; revision priority increased.':'Weak recall recorded; protect revision before adding more.';save()}
+function streak(){let d=currentDate(),n=0,base=new Date(d+'T12:00:00');for(let i=0;i<31;i++){let q=new Date(base);q.setDate(base.getDate()-i);let k=q.toISOString().slice(0,10);if(S.done[k])n++;else if(i===0)continue;else break}return n}
+function render(){
+ let d=currentDate(),r=row(d),done=Object.values(S.done).filter(Boolean).length,pct=Math.round(done/schedule.length*100);
+ document.getElementById('dateLabel').textContent=new Date(d+'T12:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+ document.getElementById('target').textContent=r[2];document.getElementById('plan').textContent=r[3];
+ document.getElementById('todayProgress').style.width=S.done[d]?'100%':'0%';document.getElementById('completionLabel').textContent=S.done[d]?'Today marked complete ✓':'Today not yet completed';
+ document.getElementById('done').textContent=done;document.getElementById('streak').textContent=streak()+' 🔥';document.getElementById('pct').textContent=pct+'%';document.getElementById('weakN').textContent=S.weak.length;
+ document.getElementById('scheduleList').innerHTML=schedule.map(x=>`<div class="item ${x[0]===d?'today':''}"><input class="check" type="checkbox" ${S.done[x[0]]?'checked':''} onchange="toggleDate('${x[0]}')"><div style="flex:1"><b>${new Date(x[0]+'T12:00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'})} • ${x[1]}</b><br>${x[2]}<br><span class="muted">${x[3]}</span></div>${S.tests[x[0]]?`<span class="badge">${S.tests[x[0]]}</span>`:''}</div>`).join('');
+ document.getElementById('weakList').innerHTML=S.weak.length?S.weak.map((w,i)=>`<div class="item"><div style="flex:1"><b>${w.ref}</b> <span class="badge">${w.level}</span><br><span class="small">Mistakes: ${w.count}</span></div><button class="secondary" onclick="repeatWeak(${i})">Repeat</button><button class="danger" onclick="removeWeak(${i})">✓</button></div>`).join(''):'<p class="muted">No weak lines logged.</p>';
+ let weakSorted=[...S.weak].sort((a,b)=>(b.level*b.count)-(a.level*a.count));
+ let q=[];if(r[3].toLowerCase().includes('revision')||r[3].toLowerCase().includes('test'))q.push(['Today',r[3],'priority']);else q.push(['New lesson',r[2],'normal']);
+ q.push(['Recent revision','Yesterday + recent pages','normal']);q.push(['7-day review','Pages learned about a week ago','normal']);q.push(['Weak lines',weakSorted.slice(0,5).map(w=>w.ref).join(', ')||'None logged','priority']);
+ document.getElementById('queue').innerHTML=q.map(x=>`<div class="item"><span class="badge ${x[2]==='priority'?'pill-warn':''}">${x[0]}</span><div style="flex:1"><b>${x[1]}</b></div><button class="secondary" onclick="goPractice()">Practice</button></div>`).join('');
+ document.getElementById('checklist').innerHTML=['Same-day review','Next-day review','7-day review','30-day review','Closed-Mushaf test'].map((x,i)=>`<label class="item"><input type="checkbox" ${S.checks&&S.checks[i]?'checked':''} onchange="setCheck(${i},this.checked)"><span>${x}</span></label>`).join('');
+ document.getElementById('score').textContent=pct+'%';document.getElementById('overall').style.width=pct+'%';document.getElementById('scoreText').textContent=done+' of '+schedule.length+' planned days completed.';
+ let vals=Object.values(S.tests);document.getElementById('strong').textContent=vals.filter(x=>x==='strong').length;document.getElementById('okay').textContent=vals.filter(x=>x==='okay').length;document.getElementById('weakTests').textContent=vals.filter(x=>x==='weak').length;document.getElementById('mistakes').textContent=S.weak.reduce((a,w)=>a+w.count,0);
+ if(S.audio[d]){document.getElementById('audioUrl').value=S.audio[d];document.getElementById('player').src=S.audio[d]}else{document.getElementById('audioUrl').value='';document.getElementById('player').removeAttribute('src')}
+ document.getElementById('dailyNote').value=S.note||'';
+}
+function toggleDate(d){S.done[d]=!S.done[d];save()}
+function addWeak(){let ref=document.getElementById('weakInput').value.trim();if(!ref)return;let level=+document.getElementById('severity').value;let old=S.weak.find(x=>x.ref.toLowerCase()===ref.toLowerCase());if(old){old.count++;old.level=Math.max(old.level,level)}else S.weak.push({ref,level,count:1});document.getElementById('weakInput').value='';save()}
+function repeatWeak(i){S.weak[i].count++;save();alert('Marked for extra repetition: '+S.weak[i].ref)}
+function removeWeak(i){S.weak.splice(i,1);save()}
+function setCheck(i,v){S.checks=S.checks||[];S.checks[i]=v;save()}
+function speak(){let t=document.getElementById('refText').value.trim();if(!t)return alert('Paste the Arabic lesson text first.');speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';u.rate=.76;u.onstart=()=>document.getElementById('listenStatus').textContent='Playing…';u.onend=()=>document.getElementById('listenStatus').textContent='Finished.';speechSynthesis.speak(u)}
+function stopSpeak(){speechSynthesis.cancel();document.getElementById('listenStatus').textContent='Stopped.'}
+let recognition=null,finalTranscript='';
+function startRec(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert('Speech recognition is not available in this browser. Try Safari/Chrome with microphone permission.');return}finalTranscript='';recognition=new SR();recognition.lang='ar-SA';recognition.continuous=true;recognition.interimResults=true;recognition.onstart=()=>document.getElementById('listenStatus').textContent='Listening to your recitation…';recognition.onresult=e=>{let s='';for(let i=e.resultIndex;i<e.results.length;i++)s+=e.results[i][0].transcript+' ';document.getElementById('recText').classList.remove('hidden');document.getElementById('recText').textContent=s};recognition.onerror=e=>document.getElementById('listenStatus').textContent='Recognition: '+e.error;recognition.onend=()=>{document.getElementById('listenStatus').textContent='Stopped.';compare()};recognition.start()}
+function stopRec(){if(recognition)recognition.stop()}
+function normalize(s){return s.replace(/[ًٌٍَُِّْـٰۖۗۚۛۙۜۘ]/g,'').replace(/[^\u0600-\u06FF\s]/g,' ').replace(/\s+/g,' ').trim()}
+function compare(){let ref=normalize(document.getElementById('refText').value),got=normalize(document.getElementById('recText').textContent);if(!ref||!got)return;let a=ref.split(' '),b=got.split(' '),i=0,out=[];for(let w of a){let j=b.indexOf(w,i);if(j===-1)out.push(`<span class="word missing">${w}</span>`);else{while(i<j){out.push(`<span class="word extra">${b[i]}</span>`);i++}out.push(`<span class="word">${w}</span>`);i=j+1}}while(i<b.length){out.push(`<span class="word extra">${b[i]}</span>`);i++}let matched=a.filter(w=>b.includes(w)).length,score=Math.round(matched/Math.max(a.length,1)*100);document.getElementById('compareBox').classList.remove('hidden');document.getElementById('compareBox').innerHTML=`<b>Approximate word match: ${score}%</b><p class="small">Red = expected word not recognized. Yellow = extra/recognized word. This cannot assess Tajweed, makharij, harakat, or pronunciation reliably.</p><div dir="rtl">${out.join(' ')}</div>`}
+function saveAudio(){let d=currentDate(),u=document.getElementById('audioUrl').value.trim();if(!u)return;S.audio[d]=u;save();alert('Audio saved for '+d)}
+function playAudio(){document.getElementById('player').play()}
+function exportData(){let blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='quran-hifz-progress-v2.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);save();alert('Progress imported.')}catch{alert('Invalid backup file.')}};r.readAsText(f)}
+function saveNote(){S.note=document.getElementById('dailyNote').value;save();alert('Note saved')}
+render();
+</script>
+</body>
+</html>
