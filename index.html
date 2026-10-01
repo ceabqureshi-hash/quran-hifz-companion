@@ -278,6 +278,11 @@ function planForDate(startDate,horizonDays=45){
       continue;
     }
     const isFirstDay=isoD===iso(scheduleStart);
+    const savedToday=state.results?.[isoD];
+    if(savedToday){
+      rows.push({date:isoD,type:"Completed",target:savedToday.key||"Today's lesson completed",workload:`${savedToday.actual||0} lines completed • ${savedToday.score||0}%`,segments:[]});
+      continue;
+    }
     if(!isFirstDay && d.getDay()===5){rows.push({date:isoD,type:isMonthEnd(d)?"Monthly test":"Weekly revision/test",target:"Revision / test",workload:"No new lesson",segments:[]});continue}
     if(remaining<=0){rows.push({date:isoD,type:"Complete",target:"Quran completed",workload:"Revision only",segments:[]});continue}
     const available=Math.max(1,learningDays(d,end));
@@ -536,8 +541,15 @@ function saveResult(){
   actual=clamp(actual,0,planned+20);
   const date=iso(todayDate()),key=currentTask?.target||`P${currentPage}`;
   let label=score<75?"Not passed — repeat / carry forward":score<90?"Passed — extra revision":"Strong — advance";
+  state.results=state.results||{};
+  if(state.results[date]){
+    document.getElementById("resultMsg").textContent="Today's result is already saved. The schedule will not advance twice.";
+    renderAll(); renderSchedule();
+    return;
+  }
   const entry={date,label,key,score,actual,type:document.getElementById("resultType").value,note:document.getElementById("resultNote").value};
-  state.history.push(entry);state.results=state.results||{};state.results[date]=entry;
+  state.history.push(entry);
+  state.results[date]=entry;
   if(score>=75&&actual>0){
     state.cursor=Math.min(totalLearningLines+1,state.cursor+actual);
     state.passedLines=Math.min(totalLearningLines,state.passedLines+actual);
@@ -552,8 +564,8 @@ function saveResult(){
     state.streak=(state.lastDate&&Math.abs(new Date(date)-new Date(state.lastDate))===86400000)?(state.streak||0)+1:1;
     state.lastDate=date;
   }
-  save();renderAll();
-  document.getElementById("resultMsg").textContent=label+" • adaptive schedule recalculated from your actual progress.";
+  save();renderAll();renderSchedule();
+  document.getElementById("resultMsg").textContent=label+" • today is marked completed and the next learning day is recalculated from your actual progress.";
 }
 document.getElementById("saveResult").onclick=saveResult;
 document.getElementById("actualLinesInput").onfocus=()=>{if(!Number(document.getElementById("actualLinesInput").value)){document.getElementById("actualLinesInput").value=currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0}};
