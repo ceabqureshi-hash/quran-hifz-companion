@@ -573,7 +573,8 @@ function environmentCheck(){
     document.querySelector(".app").prepend(n);
   }
 }
-\nfunction showStartDateSetup(){
+
+function showStartDateSetup(){
   const modal=document.getElementById("startDateModal");
   if(!state.startDate){
     document.getElementById("startDateInput").value=iso(todayDate());
