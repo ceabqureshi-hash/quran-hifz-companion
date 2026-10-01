@@ -213,7 +213,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 
 <script>
 const DEVICE="iPhone";
-const APP_VERSION=7;
+const APP_VERSION=8;
 const STORAGE="qhc_final_"+DEVICE;
 const QUL_BASE="https://qul.tarteel.ai/mushaf_layouts/6?page_number=";
 const QUL_INDEX_PROXY="https://r.jina.ai/https://qul.tarteel.ai/mushaf_layouts/6";
@@ -228,8 +228,9 @@ const modes={
 };
 const openingLines={1:6,2:6};
 function linesOnPage(p){return p<=2?6:15}
-function iso(d){return d.toISOString().slice(0,10)}
-function fmtDate(s){return new Date(s+"T00:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function parseLocalDate(s){if(s instanceof Date)return new Date(s.getFullYear(),s.getMonth(),s.getDate()); const [y,m,d]=String(s).split("-").map(Number); return new Date(y,m-1,d)}
+function fmtDate(s){const d=parseLocalDate(s);return d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
 function todayDate(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
 function dayType(d){return d.getDay()===5?"revision":"new"}
@@ -272,13 +273,13 @@ function learningDays(a,b){
   return n;
 }
 function targetEndDate(){
-  const start=new Date((state.startDate||iso(todayDate()))+"T00:00:00");
+  const start=parseLocalDate(state.startDate||iso(todayDate()));
   return addDays(start,modes[state.mode].targetDays-1);
 }
 function planForDate(startDate,horizonDays=45){
   const rows=[],end=targetEndDate();
-  const scheduleStart=new Date((state.startDate||iso(todayDate()))+"T00:00:00");
-  const requestedStart=new Date(startDate);
+  const scheduleStart=parseLocalDate(state.startDate||iso(todayDate()));
+  const requestedStart=parseLocalDate(startDate);
   const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
   let cursor=state.cursor;
   for(let i=0;i<horizonDays;i++){
@@ -538,7 +539,7 @@ function renderSchedule(){
      the schedule has already started). Dates before the Start Date are never
      shown as schedule rows. The Today tab may still say Before start when the
      selected start date is in the future. */
-  const start=new Date(state.startDate+"T00:00:00");
+  const start=parseLocalDate(state.startDate);
   const viewStart=todayDate()<start?start:todayDate();
   const rows=planForDate(viewStart,120);
   const filtered=rows.filter(r=>(r.date+" "+r.type+" "+r.target+" "+r.workload).toLowerCase().includes(q));
