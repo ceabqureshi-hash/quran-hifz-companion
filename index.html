@@ -184,7 +184,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
     <label style="display:block;margin-top:10px">Note<textarea id="resultNote" rows="3" style="width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:9px" placeholder="Optional"></textarea></label>
     <label style="display:flex;align-items:flex-start;gap:9px;margin-top:10px"><input id="confirmTestDone" type="checkbox" style="margin-top:4px"> <span><strong>I actually recited/tested this lesson.</strong><br><span class="small">Saving this checkbox is what allows the app to record a result. Listening to audio or opening the lesson does not count as a test.</span></span></label>
     <div class="actions" style="margin-top:10px"><button class="primary" id="saveResult">Save result & adapt schedule</button><button class="secondary" id="exportBtn">Export progress JSON</button><button class="danger" id="resetBtn">Reset local progress</button></div>
-    <div id="resultMsg" class="notice" style="margin-top:10px">No result saved today. Nothing is marked Strong/Weak until you actually test or recite and confirm it.</div>
+    <div id="resultMsg" class="notice" style="margin-top:10px">No verified result saved today. Saving alone never completes a lesson.</div>
   </div>
   <div class="card"><h2>Data Sources</h2>
     <div class="row"><span>Mushaf layout</span><strong>QUL • Indopak 15-line Qudratullah</strong></div>
@@ -196,7 +196,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 </div>
 </section>
 
-<div class="source" style="margin:18px 2px 0">QUL documents its Qudratullah layout as 610 pages / 15 lines. This app uses QUL as the page/ayah reference for pages 3–610 and uses the user's Pakistani-print scan as the opening-page reference. Arabic text is fetched by ayah and audio is streamed by ayah.</div>
+<div class="source" style="margin:18px 2px 0">Quran Hifz Companion • Final build 7 • QUL documents its Qudratullah layout as 610 pages / 15 lines. This app uses QUL as the page/ayah reference for pages 3–610 and uses the user's Pakistani-print scan as the opening-page reference. Arabic text is fetched by ayah and audio is streamed by ayah.</div>
 </div>
 
 <div id="startDateModal" class="modalOverlay hidden">
@@ -213,8 +213,8 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 
 <script>
 const DEVICE="iPhone";
-const APP_VERSION=5;
-const STORAGE="qhc_v4_"+DEVICE;
+const APP_VERSION=7;
+const STORAGE="qhc_final_"+DEVICE;
 const QUL_BASE="https://qul.tarteel.ai/mushaf_layouts/6?page_number=";
 const QUL_INDEX_PROXY="https://r.jina.ai/https://qul.tarteel.ai/mushaf_layouts/6";
 const QURAN_API="https://api.alquran.cloud/v1";
@@ -261,17 +261,7 @@ if(!state.weak) state.weak={};
 if(!state.history) state.history=[];
 if(!state.lessons) state.lessons={};
 if(!state.schemaVersion || state.schemaVersion<APP_VERSION){
-  /* Repair the known V4 accidental auto-completion pattern: the old Save button
-     silently supplied 90% and planned lines even when no test occurred. */
-  const accidental=(state.cursor===7 && state.strongLines===6 && state.passedLines===6 &&
-    Array.isArray(state.history) && state.history.length===1 &&
-    Number(state.history[0]?.score)===90 && Number(state.history[0]?.actual)===6 &&
-    !String(state.history[0]?.note||"").trim());
-  if(accidental){
-    const keepMode=state.mode||"sustainable", keepStart=state.startDate||null;
-    state={mode:keepMode,startDate:keepStart,cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
-      weak:{},history:[],results:{},lessons:{},pageRanges:state.pageRanges||null,textCache:state.textCache||{},schemaVersion:APP_VERSION};
-  }else{ state.schemaVersion=APP_VERSION; }
+  state.schemaVersion=APP_VERSION;
   localStorage.setItem(STORAGE,JSON.stringify(state));
 }
 let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="",testEvidence=false;
@@ -538,12 +528,26 @@ function renderRevision(){
   document.getElementById("revisionQueue").innerHTML=html;
 }
 function renderSchedule(){
-  const q=(document.getElementById("scheduleSearch").value||"").toLowerCase(),rows=planForDate(todayDate(),120);
+  const q=(document.getElementById("scheduleSearch").value||"").toLowerCase();
+  if(!state.startDate){
+    document.getElementById("scheduleSummary").textContent="Choose a Hifz start date to generate your schedule.";
+    document.getElementById("scheduleBody").innerHTML="<tr><td colspan=5 style=\"padding:18px\">No schedule yet. Choose your Start Date first.</td></tr>";
+    return;
+  }
+  /* The Schedule tab starts at the user's selected Hifz Start Date (or today if
+     the schedule has already started). Dates before the Start Date are never
+     shown as schedule rows. The Today tab may still say Before start when the
+     selected start date is in the future. */
+  const start=new Date(state.startDate+"T00:00:00");
+  const viewStart=todayDate()<start?start:todayDate();
+  const rows=planForDate(viewStart,120);
   const filtered=rows.filter(r=>(r.date+" "+r.type+" "+r.target+" "+r.workload).toLowerCase().includes(q));
-  const available=learningDays(todayDate(),targetEndDate());
+  const endForAverage=targetEndDate();
+  const available=learningDays(viewStart,endForAverage);
   const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
-  document.getElementById("scheduleSummary").textContent=`${modes[state.mode].label} • Remaining: ${remaining} lines • learning days to target: ${available} • required average: ${Math.ceil(remaining/Math.max(1,available))} lines/day • target end: ${fmtDate(iso(targetEndDate()))}`;
-  document.getElementById("scheduleBody").innerHTML=filtered.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.type}</td><td class="lineTarget">${r.target}</td><td>${r.workload}</td><td><span class="badge ${r.type.includes("revision")||r.type.includes("test")?"warn":""}">${state.history.find(h=>h.date===r.date)?.label||"Planned"}</span></td></tr>`).join("");
+  const required=Math.ceil(remaining/Math.max(1,available));
+  document.getElementById("scheduleSummary").textContent=`${modes[state.mode].label} • Start: ${fmtDate(state.startDate)} • Remaining: ${remaining} lines • learning days to target: ${available} • required average: ${required} lines/day • target end: ${fmtDate(iso(targetEndDate()))}`;
+  document.getElementById("scheduleBody").innerHTML=filtered.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.type}</td><td class="lineTarget">${r.target}</td><td>${r.workload}</td><td><span class="badge ${r.type.toLowerCase().includes("revision")||r.type.toLowerCase().includes("test")?"warn":""}">${state.history.find(h=>h.date===r.date)?.label||"Planned"}</span></td></tr>`).join("");
 }
 document.getElementById("scheduleSearch").oninput=renderSchedule;
 
@@ -588,7 +592,7 @@ function saveResult(){
   if(isPractice){
     const entry={date,label:"Practice logged — no Hifz progress changed",key:currentTask?.target||`P${currentPage}`,score:null,actual:0,type:resultType,note:document.getElementById("resultNote").value};
     state.history.push(entry);
-    state.results[date]=entry;
+    /* Practice is deliberately NOT stored in results: it must never make the lesson look completed. */
     save();renderAll();renderSchedule();
     document.getElementById("resultMsg").textContent="Practice logged only. Progress, Strong/Weak status, and schedule were NOT changed.";
     return;
