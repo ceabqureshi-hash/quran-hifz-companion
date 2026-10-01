@@ -43,6 +43,10 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
   .audio{height:48px}
   .arabic{font-size:24px;line-height:2.05}
 }
+
+.modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:18px;z-index:9999}
+.modalOverlay.hidden{display:none}
+.modalCard{width:min(520px,100%);background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.22)}
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -171,6 +175,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 <div class="grid">
   <div class="card"><h2>Settings</h2>
     <div class="formgrid">
+      <label>Start date<input id="settingsStartDate" type="date"></label>
       <label>Mode<select id="settingsMode"><option value="sustainable">Sustainable ~5 years</option><option value="faster">Faster ~2.5 years</option><option value="oneyear">1-Year Target</option></select></label>
       <label>Test score<input id="scoreInput" type="number" min="0" max="100" value="90"></label>
       <label>Actual lines completed<input id="actualLinesInput" type="number" min="0" value="0"></label>
@@ -191,6 +196,18 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 </section>
 
 <div class="source" style="margin:18px 2px 0">QUL documents its Qudratullah layout as 610 pages / 15 lines. This app uses QUL as the page/ayah reference for pages 3–610 and uses the user's Pakistani-print scan as the opening-page reference. Arabic text is fetched by ayah and audio is streamed by ayah.</div>
+</div>
+
+<div id="startDateModal" class="modalOverlay hidden">
+  <div class="modalCard">
+    <h2>Choose Your Hifz Start Date</h2>
+    <p class="small">The schedule is not tied to October 1, 2026. Each user chooses their own first day, and the full adaptive schedule is calculated from that date.</p>
+    <label style="display:block;margin-top:14px">Start date
+      <input id="startDateInput" type="date" style="display:block;width:100%;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:16px">
+    </label>
+    <div class="actions" style="margin-top:14px"><button class="primary" id="saveStartDate">Start Hifz Schedule</button></div>
+    <div id="startDateError" class="notice hidden" style="margin-top:10px">Please choose a start date.</div>
+  </div>
 </div>
 
 <script>
@@ -233,9 +250,10 @@ function locSegments(cursor,count){
   return out;
 }
 let state=JSON.parse(localStorage.getItem(STORAGE)||"null")||{
-  mode:"sustainable",cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
+  mode:"sustainable",startDate:null,cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
   weak:{},history:[],lessons:{},pageRanges:null,textCache:{}
 };
+if(!Object.prototype.hasOwnProperty.call(state,"startDate")) state.startDate=null;
 let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="";
 function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
 function learningDays(a,b){
@@ -244,21 +262,28 @@ function learningDays(a,b){
   return n;
 }
 function targetEndDate(){
-  const start=new Date("2026-10-01T00:00:00");
+  const start=new Date((state.startDate||iso(todayDate()))+"T00:00:00");
   return addDays(start,modes[state.mode].targetDays-1);
 }
 function planForDate(startDate,horizonDays=45){
   const rows=[],end=targetEndDate();
+  const scheduleStart=new Date((state.startDate||iso(todayDate()))+"T00:00:00");
+  const requestedStart=new Date(startDate);
   const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
   let cursor=state.cursor;
   for(let i=0;i<horizonDays;i++){
-    const d=addDays(startDate,i), isoD=iso(d);
-    if(d.getDay()===5){rows.push({date:isoD,type:isMonthEnd(d)?"Monthly test":"Weekly revision/test",target:"Revision / test",workload:"No new lesson",segments:[]});continue}
+    const d=addDays(requestedStart,i), isoD=iso(d);
+    if(d<scheduleStart){
+      rows.push({date:isoD,type:"Before start",target:"Hifz schedule has not started",workload:"No lesson",segments:[]});
+      continue;
+    }
+    const isFirstDay=isoD===iso(scheduleStart);
+    if(!isFirstDay && d.getDay()===5){rows.push({date:isoD,type:isMonthEnd(d)?"Monthly test":"Weekly revision/test",target:"Revision / test",workload:"No new lesson",segments:[]});continue}
     if(remaining<=0){rows.push({date:isoD,type:"Complete",target:"Quran completed",workload:"Revision only",segments:[]});continue}
     const available=Math.max(1,learningDays(d,end));
     const needed=Math.ceil((totalLearningLines-(cursor-1))/available);
     let planned=Math.max(1,needed);
-    if(i===0 && cursor===1)planned=6;
+    if(isFirstDay && cursor===1)planned=6;
     const segments=locSegments(cursor,planned);
     cursor+=planned;
     rows.push({date:isoD,type:"New lesson",target:segments.map(x=>x.label).join(" + "),workload:planned+" new lines",segments});
@@ -268,7 +293,8 @@ function planForDate(startDate,horizonDays=45){
 function renderHeader(){
   const d=todayDate(),pct=(state.strongLines/totalLearningLines*100);
   document.getElementById("todayTitle").textContent="Today • "+fmtDate(iso(d));
-  document.getElementById("todaySub").textContent=modes[state.mode].label+" • adaptive scheduling ON";
+  document.getElementById("todaySub").textContent=modes[state.mode].label+" • starts "+fmtDate(state.startDate||iso(todayDate()))+" • adaptive scheduling ON";
+  const sd=document.getElementById("settingsStartDate"); if(sd) sd.value=state.startDate||"";
   document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===state.mode));
   document.getElementById("planSelect").value=state.mode;
   document.getElementById("settingsMode").value=state.mode;
@@ -279,6 +305,7 @@ function renderHeader(){
   document.getElementById("streak").textContent=state.streak||0;
 }
 function activeRow(){
+  if(!state.startDate) return {type:"Setup required",target:"Choose your Hifz start date in Settings",workload:"—",segments:[]};
   const rows=planForDate(todayDate(),1);
   return rows[0];
 }
@@ -291,7 +318,8 @@ function renderToday(){
     <div class="row"><span>Target</span><strong class="lineTarget">${r.target}</strong></div>
     <div class="row"><span>Workload</span><strong>${r.workload}</strong></div>
     <div class="row"><span>Revision due</span><strong>${due} item(s)</strong></div>
-    <div class="row"><span>Target completion</span><strong>${fmtDate(iso(targetEndDate()))}</strong></div>`;
+    <div class="row"><span>Start date</span><strong>${state.startDate?fmtDate(state.startDate):"Not set"}</strong></div>
+    <div class="row"><span>Target completion</span><strong>${state.startDate?fmtDate(iso(targetEndDate())):"Set start date first"}</strong></div>`;
 }
 function setTab(name){
   document.querySelectorAll("[id^=tab-]").forEach(x=>x.classList.add("hidden"));
@@ -306,6 +334,15 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setTab(b.data
 document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderAll();});
 document.getElementById("planSelect").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule()};
 document.getElementById("settingsMode").onchange=e=>{state.mode=e.target.value;save();renderAll()};
+document.getElementById("settingsStartDate").onchange=e=>{if(e.target.value){state.startDate=e.target.value;save();renderAll();renderSchedule();}};
+
+document.getElementById("saveStartDate").onclick=()=>{
+  const v=document.getElementById("startDateInput").value;
+  if(!v){document.getElementById("startDateError").classList.remove("hidden");return;}
+  state.startDate=v; save();
+  document.getElementById("startDateModal").classList.add("hidden");
+  renderAll(); renderSchedule();
+};
 
 function parseRangeText(t){
   const m=t.match(/\|\s*(\d+)\s*\|\s*(\d+:\d+)\s*-\s*(\d+:\d+)\s*\|/);
@@ -536,8 +573,14 @@ function environmentCheck(){
     document.querySelector(".app").prepend(n);
   }
 }
-
-function renderAll(){renderHeader();renderToday();renderRevision();renderProgress()}
+\nfunction showStartDateSetup(){
+  const modal=document.getElementById("startDateModal");
+  if(!state.startDate){
+    document.getElementById("startDateInput").value=iso(todayDate());
+    modal.classList.remove("hidden");
+  } else modal.classList.add("hidden");
+}
+function renderAll(){renderHeader();renderToday();renderRevision();renderProgress();showStartDateSetup()}
 renderAll();
 environmentCheck();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
