@@ -57,7 +57,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 <body>
 <div class="app">
 <header class="top">
-  <div><div class="brand">🕌 Quran Hifz Companion</div><div class="sub">V4 • Adaptive Hifz planner • iPhone edition</div></div>
+  <div><div class="brand">🕌 Quran Hifz Companion</div><div class="sub">V5 • Adaptive Hifz planner • iPhone edition</div></div>
   <div class="pill">Online Quran content</div>
 </header>
 
@@ -177,13 +177,14 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
     <div class="formgrid">
       <label>Start date<input id="settingsStartDate" type="date"></label>
       <label>Mode<select id="settingsMode"><option value="sustainable">Sustainable ~5 years</option><option value="faster">Faster ~2.5 years</option><option value="oneyear">1-Year Target</option></select></label>
-      <label>Test score<input id="scoreInput" type="number" min="0" max="100" value="90"></label>
-      <label>Actual lines completed<input id="actualLinesInput" type="number" min="0" value="0"></label>
+      <label>Test score<input id="scoreInput" type="number" min="0" max="100" placeholder="Enter after test"></label>
+      <label>Actual lines completed<input id="actualLinesInput" type="number" min="0" placeholder="Enter after test"></label>
     </div>
     <label style="display:block;margin-top:10px">Result type<select id="resultType"><option>Self test</option><option>Teacher/Parent test</option><option>Practice only</option></select></label>
-    <label style="display:block;margin-top:10px">Note<textarea id="resultNote" rows="3" style="width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:9px"></textarea></label>
+    <label style="display:block;margin-top:10px">Note<textarea id="resultNote" rows="3" style="width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:9px" placeholder="Optional"></textarea></label>
+    <label style="display:flex;align-items:flex-start;gap:9px;margin-top:10px"><input id="confirmTestDone" type="checkbox" style="margin-top:4px"> <span><strong>I actually recited/tested this lesson.</strong><br><span class="small">Saving this checkbox is what allows the app to record a result. Listening to audio or opening the lesson does not count as a test.</span></span></label>
     <div class="actions" style="margin-top:10px"><button class="primary" id="saveResult">Save result & adapt schedule</button><button class="secondary" id="exportBtn">Export progress JSON</button><button class="danger" id="resetBtn">Reset local progress</button></div>
-    <div id="resultMsg" class="notice" style="margin-top:10px">No result saved today.</div>
+    <div id="resultMsg" class="notice" style="margin-top:10px">No result saved today. Nothing is marked Strong/Weak until you actually test or recite and confirm it.</div>
   </div>
   <div class="card"><h2>Data Sources</h2>
     <div class="row"><span>Mushaf layout</span><strong>QUL • Indopak 15-line Qudratullah</strong></div>
@@ -212,6 +213,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 
 <script>
 const DEVICE="iPhone";
+const APP_VERSION=5;
 const STORAGE="qhc_v4_"+DEVICE;
 const QUL_BASE="https://qul.tarteel.ai/mushaf_layouts/6?page_number=";
 const QUL_INDEX_PROXY="https://r.jina.ai/https://qul.tarteel.ai/mushaf_layouts/6";
@@ -251,10 +253,28 @@ function locSegments(cursor,count){
 }
 let state=JSON.parse(localStorage.getItem(STORAGE)||"null")||{
   mode:"sustainable",startDate:null,cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
-  weak:{},history:[],lessons:{},pageRanges:null,textCache:{}
+  weak:{},history:[],lessons:{},results:{},pageRanges:null,textCache:{},schemaVersion:APP_VERSION
 };
 if(!Object.prototype.hasOwnProperty.call(state,"startDate")) state.startDate=null;
-let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="";
+if(!state.results) state.results={};
+if(!state.weak) state.weak={};
+if(!state.history) state.history=[];
+if(!state.lessons) state.lessons={};
+if(!state.schemaVersion || state.schemaVersion<APP_VERSION){
+  /* Repair the known V4 accidental auto-completion pattern: the old Save button
+     silently supplied 90% and planned lines even when no test occurred. */
+  const accidental=(state.cursor===7 && state.strongLines===6 && state.passedLines===6 &&
+    Array.isArray(state.history) && state.history.length===1 &&
+    Number(state.history[0]?.score)===90 && Number(state.history[0]?.actual)===6 &&
+    !String(state.history[0]?.note||"").trim());
+  if(accidental){
+    const keepMode=state.mode||"sustainable", keepStart=state.startDate||null;
+    state={mode:keepMode,startDate:keepStart,cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
+      weak:{},history:[],results:{},lessons:{},pageRanges:state.pageRanges||null,textCache:state.textCache||{},schemaVersion:APP_VERSION};
+  }else{ state.schemaVersion=APP_VERSION; }
+  localStorage.setItem(STORAGE,JSON.stringify(state));
+}
+let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="",testEvidence=false;
 function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
 function learningDays(a,b){
   let n=0;
@@ -336,9 +356,9 @@ function setTab(name){
   if(name==="progress")renderProgress();
 }
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
-document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderAll();});
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=`Mode changed to ${modes[state.mode].label}. Schedule recalculated from your current verified progress; no progress was added.`;});
 document.getElementById("planSelect").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule()};
-document.getElementById("settingsMode").onchange=e=>{state.mode=e.target.value;save();renderAll()};
+document.getElementById("settingsMode").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=`Mode changed to ${modes[state.mode].label}. Schedule recalculated from your current verified progress; no progress was added.`;};
 document.getElementById("settingsStartDate").onchange=e=>{if(e.target.value){state.startDate=e.target.value;save();renderAll();renderSchedule();}};
 
 document.getElementById("saveStartDate").onclick=()=>{
@@ -392,6 +412,10 @@ async function fetchAyahText(ref){
   state.textCache[ref]=txt;save();return txt;
 }
 async function loadLesson(page){
+  testEvidence=false;
+  const cb=document.getElementById("confirmTestDone"); if(cb) cb.checked=false;
+  const si=document.getElementById("scoreInput"); if(si) si.value="";
+  const ai=document.getElementById("actualLinesInput"); if(ai) ai.value="";
   currentPage=clamp(page,2,totalPages);
   const rangeMap=await loadPageRanges(),range=rangeMap[currentPage];
   document.getElementById("lessonTitle").textContent="Page "+currentPage+" • "+(currentPage<=2?"Opening Pakistani-print page":"Qudratullah 15-line page");
@@ -484,6 +508,11 @@ if("webkitSpeechRecognition" in window||"SpeechRecognition" in window){
   recognition.onresult=e=>{
     const heard=Array.from(e.results).map(x=>x[0].transcript).join(" ");
     const d=tokenDiff(currentLessonText,heard);
+    testEvidence=true;
+    document.getElementById("scoreInput").value=d.score;
+    const plannedNow=Math.max(0,currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0);
+    document.getElementById("actualLinesInput").value=plannedNow;
+    document.getElementById("confirmTestDone").checked=true;
     document.getElementById("recResult").innerHTML=`<div class="score">${d.score}% approximate match</div><div class="small">Heard: ${escapeHtml(heard)}</div>`;
     document.getElementById("recCompare").innerHTML=d.matched.map(x=>`<span class="word ${x.status==="ok"?"okw":"miss"}" dir="rtl">${escapeHtml(x.w)}</span>`).join("")+
       d.extras.map(x=>`<span class="word extra" dir="rtl">+${escapeHtml(x)}</span>`).join("");
@@ -513,7 +542,7 @@ function renderSchedule(){
   const filtered=rows.filter(r=>(r.date+" "+r.type+" "+r.target+" "+r.workload).toLowerCase().includes(q));
   const available=learningDays(todayDate(),targetEndDate());
   const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
-  document.getElementById("scheduleSummary").textContent=`Remaining: ${remaining} lines • learning days to target: ${available} • adaptive requirement: ${Math.ceil(remaining/Math.max(1,available))} lines/day on average • target end: ${fmtDate(iso(targetEndDate()))}`;
+  document.getElementById("scheduleSummary").textContent=`${modes[state.mode].label} • Remaining: ${remaining} lines • learning days to target: ${available} • required average: ${Math.ceil(remaining/Math.max(1,available))} lines/day • target end: ${fmtDate(iso(targetEndDate()))}`;
   document.getElementById("scheduleBody").innerHTML=filtered.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.type}</td><td class="lineTarget">${r.target}</td><td>${r.workload}</td><td><span class="badge ${r.type.includes("revision")||r.type.includes("test")?"warn":""}">${state.history.find(h=>h.date===r.date)?.label||"Planned"}</span></td></tr>`).join("");
 }
 document.getElementById("scheduleSearch").oninput=renderSchedule;
@@ -534,41 +563,86 @@ function renderProgress(){
     <div class="row"><span>Month-end</span><strong>Protected monthly test</strong></div>`;
 }
 function saveResult(){
-  const score=clamp(Number(document.getElementById("scoreInput").value)||0,0,100);
+  const resultType=document.getElementById("resultType").value;
+  const isPractice=resultType==="Practice only";
+  const confirmed=document.getElementById("confirmTestDone").checked;
+  const scoreRaw=document.getElementById("scoreInput").value.trim();
+  const actualRaw=document.getElementById("actualLinesInput").value.trim();
   const planned=Math.max(0,currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0);
-  let actual=Number(document.getElementById("actualLinesInput").value);
-  if(!actual)actual=planned;
-  actual=clamp(actual,0,planned+20);
-  const date=iso(todayDate()),key=currentTask?.target||`P${currentPage}`;
-  let label=score<75?"Not passed — repeat / carry forward":score<90?"Passed — extra revision":"Strong — advance";
-  state.results=state.results||{};
-  if(state.results[date]){
-    document.getElementById("resultMsg").textContent="Today's result is already saved. The schedule will not advance twice.";
-    renderAll(); renderSchedule();
+  const date=iso(todayDate());
+
+  if(!state.startDate){
+    document.getElementById("resultMsg").textContent="Choose a Hifz start date first.";
     return;
   }
-  const entry={date,label,key,score,actual,type:document.getElementById("resultType").value,note:document.getElementById("resultNote").value};
+  if(currentTask?.type==="Before start" || currentTask?.type==="Setup required"){
+    document.getElementById("resultMsg").textContent="The Hifz schedule has not started yet. Nothing was saved.";
+    return;
+  }
+  if(state.results?.[date]){
+    document.getElementById("resultMsg").textContent="Today's result is already saved. The schedule will not advance twice.";
+    return;
+  }
+
+  /* Practice-only notes never change Hifz progress. */
+  if(isPractice){
+    const entry={date,label:"Practice logged — no Hifz progress changed",key:currentTask?.target||`P${currentPage}`,score:null,actual:0,type:resultType,note:document.getElementById("resultNote").value};
+    state.history.push(entry);
+    state.results[date]=entry;
+    save();renderAll();renderSchedule();
+    document.getElementById("resultMsg").textContent="Practice logged only. Progress, Strong/Weak status, and schedule were NOT changed.";
+    return;
+  }
+
+  if(!confirmed){
+    document.getElementById("resultMsg").textContent="Nothing was saved. First recite/test the lesson, then tick “I actually recited/tested this lesson.” Listening to audio alone does not count.";
+    return;
+  }
+  if(scoreRaw==="" || actualRaw===""){
+    document.getElementById("resultMsg").textContent="Enter the actual test score and actual lines completed before saving.";
+    return;
+  }
+
+  const score=clamp(Number(scoreRaw),0,100);
+  let actual=clamp(Number(actualRaw),0,planned+20);
+  const key=currentTask?.target||`P${currentPage}`;
+  const isNewLesson=currentTask?.type==="New lesson";
+  const isRevision=currentTask?.type?.toLowerCase().includes("revision") || currentTask?.type?.toLowerCase().includes("test");
+  let label=score<75?"Not passed — repeat / carry forward":score<90?"Passed — extra revision":"Strong — advance";
+
+  const entry={date,label,key,score,actual,type:resultType,note:document.getElementById("resultNote").value};
   state.history.push(entry);
   state.results[date]=entry;
-  if(score>=75&&actual>0){
-    state.cursor=Math.min(totalLearningLines+1,state.cursor+actual);
-    state.passedLines=Math.min(totalLearningLines,state.passedLines+actual);
-    if(score>=90)state.strongLines=Math.min(totalLearningLines,state.strongLines+actual);
-    const loc=cursorToLoc(Math.max(1,state.cursor-actual));
-    const reviewKey=`P${loc.page} L${loc.line}–${loc.line+actual-1}`;
-    state.lessons[reviewKey]={key:reviewKey,learnedAt:date,reviewDates:[date,iso(addDays(todayDate(),1)),iso(addDays(todayDate(),7)),iso(addDays(todayDate(),30))]};
-  }else{
-    state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date;
+
+  if(isNewLesson){
+    if(score>=75 && actual>0){
+      const startCursor=state.cursor;
+      state.cursor=Math.min(totalLearningLines+1,state.cursor+actual);
+      state.passedLines=Math.min(totalLearningLines,state.passedLines+actual);
+      if(score>=90)state.strongLines=Math.min(totalLearningLines,state.strongLines+actual);
+      const loc=cursorToLoc(startCursor);
+      const endLoc=cursorToLoc(Math.max(startCursor,state.cursor-1));
+      const reviewKey=`P${loc.page} L${loc.line}–P${endLoc.page} L${endLoc.line}`;
+      state.lessons[reviewKey]={key:reviewKey,learnedAt:date,reviewDates:[date,iso(addDays(todayDate(),1)),iso(addDays(todayDate(),7)),iso(addDays(todayDate(),30))]};
+    }else{
+      state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date;
+    }
+  }else if(isRevision){
+    if(score<75){state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date;}
+    /* Revision/test never advances the new-learning cursor. */
   }
+
   if(state.lastDate!==date){
     state.streak=(state.lastDate&&Math.abs(new Date(date)-new Date(state.lastDate))===86400000)?(state.streak||0)+1:1;
     state.lastDate=date;
   }
   save();renderAll();renderSchedule();
-  document.getElementById("resultMsg").textContent=label+" • today is marked completed and the next learning day is recalculated from your actual progress.";
+  document.getElementById("resultMsg").textContent=isNewLesson
+    ? label+" • saved from your actual test; the next learning day is now recalculated from your verified progress."
+    : "Test saved. Revision/test does not advance the new-learning cursor.";
 }
 document.getElementById("saveResult").onclick=saveResult;
-document.getElementById("actualLinesInput").onfocus=()=>{if(!Number(document.getElementById("actualLinesInput").value)){document.getElementById("actualLinesInput").value=currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0}};
+
 document.getElementById("openLesson").onclick=()=>setTab("lesson");
 document.getElementById("openRevision").onclick=()=>setTab("revision");
 document.getElementById("exportBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="quran-hifz-progress-v4.json";a.click()};
