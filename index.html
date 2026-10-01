@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#146b4b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Quran Hifz Companion V4 — iPhone</title>
+<style>
+:root{--bg:#f5f7f4;--card:#fff;--ink:#172019;--muted:#69736b;--green:#146b4b;--green2:#e2f2e9;--line:#dce4dd;--red:#a53b3b;--amber:#986900;--shadow:0 8px 30px rgba(20,40,28,.08)}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1500px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.brand{font-size:24px;font-weight:850}.sub{font-size:13px;color:var(--muted)}.pill{background:var(--green2);color:var(--green);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:750}
+.tabs{display:flex;gap:8px;overflow:auto;margin:12px 0}.tabs button,.mode{border:0;background:#eaf0eb;padding:10px 14px;border-radius:12px;white-space:nowrap}.tabs button.active,.mode.active{background:var(--green);color:white}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.hero{background:linear-gradient(135deg,#eff8f3,#fff)}
+h1,h2,h3{margin-top:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{padding:13px;border:1px solid var(--line);border-radius:14px}.stat b{display:block;font-size:21px;margin-top:4px}.actions{display:flex;flex-wrap:wrap;gap:9px}
+.primary,.secondary,.danger{border:0;padding:11px 14px;border-radius:12px;font-weight:750}.primary{background:var(--green);color:white}.secondary{background:#edf2ee}.danger{background:#fae9e9;color:var(--red)}
+.progress{height:10px;background:#e7ece8;border-radius:99px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--green);width:0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.badge{padding:5px 8px;border-radius:999px;font-size:11px;background:#edf1ed}.ok{background:#e0f2e8;color:var(--green)}.warn{background:#fff3d8;color:#805800}.bad{background:#fae5e5;color:var(--red)}
+.arabic{direction:rtl;text-align:right;font-family:"Noto Naskh Arabic","Amiri","Times New Roman",serif;font-size:29px;line-height:2.05;background:#fbfaf5;border:1px solid #ece7d8;border-radius:16px;padding:18px;min-height:130px}
+.ayah{padding:9px 4px;border-bottom:1px solid #eee9dc}.ayah:last-child{border-bottom:0}.ayah small{display:block;direction:ltr;text-align:left;color:var(--muted);font-size:11px;margin-bottom:3px}
+.mushafFrame{width:100%;height:700px;border:1px solid #e6e0cf;border-radius:16px;background:#fbfaf5}.openingFrame{height:520px}.notice{padding:11px 13px;border-radius:12px;background:#f0f4f0;color:#4f5a52;font-size:13px}.error{background:#fae9e9;color:#8f3030}
+.audio{width:100%;margin-top:10px}.tablewrap{max-height:650px;overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:9px;border-bottom:1px solid var(--line);text-align:left}.table th{position:sticky;top:0;background:#f4f7f4}
+select,input{border:1px solid var(--line);border-radius:10px;padding:9px;background:white}.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.small{font-size:12px;color:var(--muted)}.hidden{display:none}.source{font-size:11px;color:var(--muted);margin-top:10px}.score{font-size:30px;font-weight:850}.word{display:inline-block;margin:2px 3px;padding:2px 4px;border-radius:5px}.word.okw{background:#e5f4ea}.word.miss{background:#fae5e5}.word.extra{background:#fff0cf}
+.lineTarget{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.mini{font-size:12px;padding:7px 9px;border-radius:9px;background:#edf2ee;border:0}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.app{padding:14px}.arabic{font-size:25px}.mushafFrame{height:620px}}
+
+@media(max-width:700px){
+  .app{padding:10px}.top{align-items:flex-start}.brand{font-size:20px}.card{border-radius:16px;padding:14px}
+  .mushafFrame{height:72vh;min-height:520px}.openingFrame{height:58vh;min-height:430px}
+  .stats{gap:7px}.stat{padding:10px}.stat b{font-size:18px}.tabs button,.mode{padding:9px 12px}
+  .arabic{font-size:23px;line-height:2;padding:14px}.grid{gap:12px}
+}
+
+
+@media(max-width:700px){
+  body{background:#f5f7f4}
+  .app{padding:10px}
+  button,.mode,.tabs button{min-height:44px}
+  .mushafFrame{height:68vh;min-height:480px}
+  .openingFrame{height:55vh;min-height:400px}
+  .audio{height:48px}
+  .arabic{font-size:24px;line-height:2.05}
+}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Hifz Companion">
+<meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div><div class="brand">🕌 Quran Hifz Companion</div><div class="sub">V4 • Adaptive Hifz planner • iPhone edition</div></div>
+  <div class="pill">Online Quran content</div>
+</header>
+
+<div class="card hero">
+  <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap">
+    <div><h1 id="todayTitle">Today</h1><div id="todaySub" class="sub"></div></div>
+    <div class="actions">
+      <button class="mode active" data-mode="sustainable">🟢 Sustainable ~5y</button>
+      <button class="mode" data-mode="faster">🟡 Faster ~2.5y</button>
+      <button class="mode" data-mode="oneyear">🔴 1-Year Target</button>
+    </div>
+  </div>
+  <div class="stats" style="margin-top:15px">
+    <div class="stat">Strong lines<b id="strongLines">0</b></div>
+    <div class="stat">Progress<b id="progressPct">0%</b></div>
+    <div class="stat">Weak items<b id="weakLines">0</b></div>
+    <div class="stat">Streak<b id="streak">0</b></div>
+  </div>
+  <div style="margin-top:14px" class="progress"><span id="progressBar"></span></div>
+</div>
+
+<div class="tabs">
+  <button class="active" data-tab="today">Today</button><button data-tab="lesson">Lesson</button>
+  <button data-tab="revision">Revision</button><button data-tab="schedule">Schedule</button>
+  <button data-tab="progress">Progress</button><button data-tab="settings">Settings</button>
+</div>
+
+<section id="tab-today">
+<div class="grid">
+  <div class="card"><h2>Today's Hifz</h2><div id="todayCard"></div>
+    <div class="actions" style="margin-top:14px"><button class="primary" id="openLesson">📖 Open Lesson</button><button class="secondary" id="openRevision">🔁 Revision Queue</button></div>
+  </div>
+  <div class="card"><h2>Smart Rules</h2>
+    <div class="row"><span>Below 75%</span><span class="badge bad">Not passed • repeat</span></div>
+    <div class="row"><span>75–89%</span><span class="badge warn">Passed • extra revision</span></div>
+    <div class="row"><span>90%+</span><span class="badge ok">Strong • advance</span></div>
+    <div class="row"><span>Missed / no result</span><span class="badge">Carry forward</span></div>
+    <div class="row"><span>Extra successful lines</span><span class="badge ok">Can advance</span></div>
+    <div class="notice" style="margin-top:12px">Revision days are protected. The adaptive engine changes new-learning workload around your actual progress; it does not remove Friday testing or monthly testing.</div>
+  </div>
+</div>
+</section>
+
+<section id="tab-lesson" class="hidden">
+<div class="grid">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <div><h2 id="lessonTitle">Lesson</h2><div id="lessonMeta" class="sub"></div></div><span id="lessonBadge" class="badge">Ready</span>
+    </div>
+    <div id="arabicText" class="arabic">Loading Quran text…</div>
+    <div class="actions" style="margin-top:10px">
+      <button class="primary" id="listenBtn">▶ Listen — Maher Al-Muaiqly</button>
+      <button class="secondary" id="stopAudio">■ Stop</button>
+      <button class="secondary" id="reloadLesson">↻ Reload</button>
+    </div>
+    <audio id="player" class="audio" controls preload="none"></audio>
+    <div id="audioQueue" class="small" style="margin-top:8px"></div>
+    <div class="source">Audio is referenced verse-by-verse from EveryAyah; the app does not bundle or modify the recordings.</div>
+
+    <div class="card" style="margin-top:16px;padding:14px;background:#fafcf9">
+      <h3>Recitation Practice</h3>
+      <div class="small">Speech recognition is only a practice aid. It is not a Tajweed or makharij authority.</div>
+      <div class="actions" style="margin-top:9px"><button class="primary" id="startRec">🎙 Start recitation</button><button class="secondary" id="stopRec">Stop</button></div>
+      <div id="recStatus" class="notice" style="margin-top:9px">Ready.</div>
+      <div id="recResult" style="margin-top:9px"></div>
+      <div id="recCompare" style="margin-top:9px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Exact Mushaf Page</h2>
+    <div id="mushafNotice" class="notice">The page below is loaded directly from the selected source. The app will never substitute another page silently.</div>
+    <iframe id="mushafFrame" class="mushafFrame" title="Exact Mushaf page" referrerpolicy="no-referrer"></iframe>
+    <div class="actions" style="margin-top:9px">
+      <a id="sourceLink" class="secondary" target="_blank" rel="noopener" style="text-decoration:none">Open source page ↗</a>
+      <button class="secondary" id="prevPage">← Previous page</button>
+      <button class="secondary" id="nextPage">Next page →</button>
+    </div>
+  </div>
+</div>
+</section>
+
+<section id="tab-revision" class="hidden">
+<div class="grid">
+  <div class="card"><h2>Revision Queue</h2><div id="revisionQueue"></div></div>
+  <div class="card"><h2>Revision Cycle</h2>
+    <div class="row"><span>Same day</span><span class="badge">After lesson</span></div>
+    <div class="row"><span>Next day</span><span class="badge">1 day</span></div>
+    <div class="row"><span>7-day</span><span class="badge">7 days</span></div>
+    <div class="row"><span>30-day</span><span class="badge">30 days</span></div>
+    <div class="row"><span>Friday</span><span class="badge warn">Weekly test</span></div>
+    <div class="row"><span>Month-end</span><span class="badge warn">Monthly test</span></div>
+  </div>
+</div>
+</section>
+
+<section id="tab-schedule" class="hidden">
+<div class="card">
+  <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2>Adaptive Schedule</h2>
+    <div class="actions"><select id="planSelect"><option value="sustainable">Sustainable ~5 years</option><option value="faster">Faster ~2.5 years</option><option value="oneyear">1-Year Target</option></select><input id="scheduleSearch" placeholder="Search page / date / revision…"></div>
+  </div>
+  <div id="scheduleSummary" class="notice" style="margin-bottom:10px"></div>
+  <div class="tablewrap"><table class="table"><thead><tr><th>Date</th><th>Type</th><th>Target</th><th>Workload</th><th>Status</th></tr></thead><tbody id="scheduleBody"></tbody></table></div>
+</div>
+</section>
+
+<section id="tab-progress" class="hidden">
+<div class="grid">
+  <div class="card"><h2>Hifz Health</h2><div id="healthBox"></div></div>
+  <div class="card"><h2>Statistics</h2><div id="statsBox"></div></div>
+</div>
+</section>
+
+<section id="tab-settings" class="hidden">
+<div class="grid">
+  <div class="card"><h2>Settings</h2>
+    <div class="formgrid">
+      <label>Mode<select id="settingsMode"><option value="sustainable">Sustainable ~5 years</option><option value="faster">Faster ~2.5 years</option><option value="oneyear">1-Year Target</option></select></label>
+      <label>Test score<input id="scoreInput" type="number" min="0" max="100" value="90"></label>
+      <label>Actual lines completed<input id="actualLinesInput" type="number" min="0" value="0"></label>
+    </div>
+    <label style="display:block;margin-top:10px">Result type<select id="resultType"><option>Self test</option><option>Teacher/Parent test</option><option>Practice only</option></select></label>
+    <label style="display:block;margin-top:10px">Note<textarea id="resultNote" rows="3" style="width:100%;margin-top:5px;border:1px solid var(--line);border-radius:10px;padding:9px"></textarea></label>
+    <div class="actions" style="margin-top:10px"><button class="primary" id="saveResult">Save result & adapt schedule</button><button class="secondary" id="exportBtn">Export progress JSON</button><button class="danger" id="resetBtn">Reset local progress</button></div>
+    <div id="resultMsg" class="notice" style="margin-top:10px">No result saved today.</div>
+  </div>
+  <div class="card"><h2>Data Sources</h2>
+    <div class="row"><span>Mushaf layout</span><strong>QUL • Indopak 15-line Qudratullah</strong></div>
+    <div class="row"><span>Opening pages</span><strong>Your Pakistani-print scan source</strong></div>
+    <div class="row"><span>Arabic lesson text</span><strong>AlQuran Cloud • quran-uthmani</strong></div>
+    <div class="row"><span>Audio</span><strong>Maher Al-Muaiqly • EveryAyah</strong></div>
+    <div class="notice" style="margin-top:10px">Internet is required for live Quran text, the Mushaf page viewer, and audio.</div>
+  </div>
+</div>
+</section>
+
+<div class="source" style="margin:18px 2px 0">QUL documents its Qudratullah layout as 610 pages / 15 lines. This app uses QUL as the page/ayah reference for pages 3–610 and uses the user's Pakistani-print scan as the opening-page reference. Arabic text is fetched by ayah and audio is streamed by ayah.</div>
+</div>
+
+<script>
+const DEVICE="iPhone";
+const STORAGE="qhc_v4_"+DEVICE;
+const QUL_BASE="https://qul.tarteel.ai/mushaf_layouts/6?page_number=";
+const QUL_INDEX_PROXY="https://r.jina.ai/https://qul.tarteel.ai/mushaf_layouts/6";
+const QURAN_API="https://api.alquran.cloud/v1";
+const AUDIO_ROOT="https://everyayah.com/data/MaherAlMuaiqly128kbps/";
+const ARCHIVE_BASE="https://archive.org/details/QuranMajeed-15Lines-PakistaniPrint";
+const totalPages=610, totalLearningLines=9126;
+const modes={
+  sustainable:{label:"Sustainable ~5 years",targetDays:1825,base:5},
+  faster:{label:"Faster ~2.5 years",targetDays:912,base:10},
+  oneyear:{label:"1-Year Target",targetDays:365,base:29}
+};
+const openingLines={1:6,2:6};
+function linesOnPage(p){return p<=2?6:15}
+function iso(d){return d.toISOString().slice(0,10)}
+function fmtDate(s){return new Date(s+"T00:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+function todayDate(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function dayType(d){return d.getDay()===5?"revision":"new"}
+function isMonthEnd(d){return d.getDate()===new Date(d.getFullYear(),d.getMonth()+1,0).getDate()}
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
+function lineLabel(p,s,e){return `P${p} L${s}–${e}`}
+function cursorToLoc(cursor){
+  let c=Math.max(1,Math.min(totalLearningLines,cursor));
+  let p=2;
+  while(c>linesOnPage(p)){c-=linesOnPage(p);p++}
+  return {page:p,line:c};
+}
+function locSegments(cursor,count){
+  const out=[];let p=cursorToLoc(cursor).page,l=cursorToLoc(cursor).line,left=count;
+  while(left>0){
+    const cap=linesOnPage(p)-l+1,take=Math.min(cap,left);
+    out.push({page:p,start:l,end:l+take-1,label:lineLabel(p,l,l+take-1)});
+    left-=take;p++;l=1;
+  }
+  return out;
+}
+let state=JSON.parse(localStorage.getItem(STORAGE)||"null")||{
+  mode:"sustainable",cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
+  weak:{},history:[],lessons:{},pageRanges:null,textCache:{}
+};
+let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="";
+function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
+function learningDays(a,b){
+  let n=0;
+  for(let d=new Date(a);d<=b;d=addDays(d,1)) if(d.getDay()!==5)n++;
+  return n;
+}
+function targetEndDate(){
+  const start=new Date("2026-10-01T00:00:00");
+  return addDays(start,modes[state.mode].targetDays-1);
+}
+function planForDate(startDate,horizonDays=45){
+  const rows=[],end=targetEndDate();
+  const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
+  let cursor=state.cursor;
+  for(let i=0;i<horizonDays;i++){
+    const d=addDays(startDate,i), isoD=iso(d);
+    if(d.getDay()===5){rows.push({date:isoD,type:isMonthEnd(d)?"Monthly test":"Weekly revision/test",target:"Revision / test",workload:"No new lesson",segments:[]});continue}
+    if(remaining<=0){rows.push({date:isoD,type:"Complete",target:"Quran completed",workload:"Revision only",segments:[]});continue}
+    const available=Math.max(1,learningDays(d,end));
+    const needed=Math.ceil((totalLearningLines-(cursor-1))/available);
+    let planned=Math.max(1,needed);
+    if(i===0 && cursor===1)planned=6;
+    const segments=locSegments(cursor,planned);
+    cursor+=planned;
+    rows.push({date:isoD,type:"New lesson",target:segments.map(x=>x.label).join(" + "),workload:planned+" new lines",segments});
+  }
+  return rows;
+}
+function renderHeader(){
+  const d=todayDate(),pct=(state.strongLines/totalLearningLines*100);
+  document.getElementById("todayTitle").textContent="Today • "+fmtDate(iso(d));
+  document.getElementById("todaySub").textContent=modes[state.mode].label+" • adaptive scheduling ON";
+  document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===state.mode));
+  document.getElementById("planSelect").value=state.mode;
+  document.getElementById("settingsMode").value=state.mode;
+  document.getElementById("strongLines").textContent=state.strongLines;
+  document.getElementById("progressPct").textContent=pct.toFixed(1)+"%";
+  document.getElementById("progressBar").style.width=Math.min(100,pct)+"%";
+  document.getElementById("weakLines").textContent=Object.keys(state.weak).length;
+  document.getElementById("streak").textContent=state.streak||0;
+}
+function activeRow(){
+  const rows=planForDate(todayDate(),1);
+  return rows[0];
+}
+function renderToday(){
+  const r=activeRow();currentTask=r;
+  if(r?.segments?.length)currentPage=r.segments[0].page;
+  const due=dueReviews().length;
+  document.getElementById("todayCard").innerHTML=`
+    <div class="row"><span>Plan</span><strong>${r.type}</strong></div>
+    <div class="row"><span>Target</span><strong class="lineTarget">${r.target}</strong></div>
+    <div class="row"><span>Workload</span><strong>${r.workload}</strong></div>
+    <div class="row"><span>Revision due</span><strong>${due} item(s)</strong></div>
+    <div class="row"><span>Target completion</span><strong>${fmtDate(iso(targetEndDate()))}</strong></div>`;
+}
+function setTab(name){
+  document.querySelectorAll("[id^=tab-]").forEach(x=>x.classList.add("hidden"));
+  document.getElementById("tab-"+name).classList.remove("hidden");
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  if(name==="lesson")loadLesson(currentPage);
+  if(name==="revision")renderRevision();
+  if(name==="schedule")renderSchedule();
+  if(name==="progress")renderProgress();
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderAll();});
+document.getElementById("planSelect").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule()};
+document.getElementById("settingsMode").onchange=e=>{state.mode=e.target.value;save();renderAll()};
+
+function parseRangeText(t){
+  const m=t.match(/\|\s*(\d+)\s*\|\s*(\d+:\d+)\s*-\s*(\d+:\d+)\s*\|/);
+  return m?{page:+m[1],from:m[2],to:m[3]}:null;
+}
+async function loadPageRanges(){
+  if(state.pageRanges&&Object.keys(state.pageRanges).length>100)return state.pageRanges;
+  try{
+    const r=await fetch(QUL_INDEX_PROXY,{cache:"no-store"});
+    if(!r.ok)throw new Error("QUL index unavailable");
+    const t=await r.text(),map={};
+    const re=/\|\s*(\d+)\s*\|\s*(\d+:\d+)\s*-\s*(\d+:\d+)\s*\|/g;let m;
+    while((m=re.exec(t)))map[m[1]]={page:+m[1],from:m[2],to:m[3]};
+    if(Object.keys(map).length<100)throw new Error("QUL index did not contain enough page ranges");
+    state.pageRanges=map;save();return map;
+  }catch(e){
+    const fallback={
+      1:{page:1,from:"1:1",to:"1:7"},2:{page:2,from:"2:1",to:"2:4"},
+      3:{page:3,from:"2:5",to:"2:15"},4:{page:4,from:"2:16",to:"2:23"},
+      5:{page:5,from:"2:24",to:"2:29"},6:{page:6,from:"2:30",to:"2:37"},
+      7:{page:7,from:"2:38",to:"2:48"},8:{page:8,from:"2:49",to:"2:57"},
+      9:{page:9,from:"2:58",to:"2:61"},10:{page:10,from:"2:62",to:"2:69"}
+    };
+    return fallback;
+  }
+}
+function parseRef(x){const [s,a]=x.split(":").map(Number);return{s,a}}
+function refsBetween(from,to){
+  const a=parseRef(from),b=parseRef(to),out=[];
+  if(a.s===b.s){for(let n=a.a;n<=b.a;n++)out.push(`${a.s}:${n}`);return out}
+  for(let s=a.s,n=a.a;s<=b.s;s++){const max=s===b.s?b.a:(QURAN_COUNTS[s]||0);for(;n<=max;n++)out.push(`${s}:${n}`);n=1}
+  return out;
+}
+const QURAN_COUNTS={1:7,2:286,3:200,4:176,5:120,6:165,7:206,8:75,9:129,10:109,11:123,12:111,13:43,14:52,15:99,16:128,17:111,18:110,19:98,20:135,21:112,22:78,23:118,24:64,25:77,26:227,27:93,28:88,29:69,30:60,31:34,32:30,33:73,34:54,35:45,36:83,37:182,38:88,39:75,40:85,41:54,42:53,43:89,44:59,45:37,46:35,47:38,48:29,49:18,50:45,51:60,52:49,53:62,54:55,55:78,56:96,57:29,58:22,59:24,60:13,61:14,62:11,63:11,64:18,65:12,66:12,67:30,68:52,69:52,70:44,71:28,72:28,73:20,74:56,75:40,76:31,77:50,78:40,79:46,80:42,81:29,82:19,83:36,84:25,85:22,86:17,87:19,88:26,89:30,90:20,91:15,92:21,93:11,94:8,95:8,96:19,97:5,98:8,99:8,100:11,101:11,102:8,103:3,104:9,105:5,106:4,107:7,108:3,109:6,110:3,111:5,112:4,113:5,114:6};
+
+async function fetchAyahText(ref){
+  if(state.textCache[ref])return state.textCache[ref];
+  const r=await fetch(`${QURAN_API}/ayah/${ref}/quran-uthmani`,{cache:"force-cache"});
+  if(!r.ok)throw new Error("Arabic text unavailable for "+ref);
+  const j=await r.json(),txt=j.data?.text;
+  if(!txt)throw new Error("Arabic text missing for "+ref);
+  state.textCache[ref]=txt;save();return txt;
+}
+async function loadLesson(page){
+  currentPage=clamp(page,2,totalPages);
+  const rangeMap=await loadPageRanges(),range=rangeMap[currentPage];
+  document.getElementById("lessonTitle").textContent="Page "+currentPage+" • "+(currentPage<=2?"Opening Pakistani-print page":"Qudratullah 15-line page");
+  document.getElementById("arabicText").innerHTML='<div class="notice">Loading ayahs…</div>';
+  document.getElementById("mushafNotice").textContent="Loading selected page directly — page substitution is disabled.";
+  const frame=document.getElementById("mushafFrame");
+  if(currentPage<=2){
+    frame.className="mushafFrame openingFrame";
+    frame.src=ARCHIVE_BASE+"/page/n"+(currentPage-1)+"/mode/1up";
+    document.getElementById("sourceLink").href=frame.src;
+    document.getElementById("mushafNotice").textContent="Opening page uses the Pakistani-print scan source so the 6-line opening layout is preserved.";
+  }else{
+    frame.className="mushafFrame";
+    frame.src=QUL_BASE+currentPage;
+    document.getElementById("sourceLink").href=frame.src;
+    document.getElementById("mushafNotice").textContent="QUL Qudratullah page "+currentPage+" is loaded directly.";
+  }
+  if(!range){
+    document.getElementById("lessonMeta").textContent="Ayah range unavailable. The page itself remains visible; no incorrect range will be invented.";
+    document.getElementById("lessonBadge").textContent="Page only";
+    document.getElementById("arabicText").innerHTML='<div class="notice error">Ayah range could not be verified. Reload while online.</div>';
+    audioRefs=[];return;
+  }
+  document.getElementById("lessonMeta").textContent=`Ayahs ${range.from} → ${range.to} • ${currentPage<=2?"Opening scan":"QUL page map"}`;
+  const refs=refsBetween(range.from,range.to);
+  try{
+    const texts=await Promise.all(refs.map(fetchAyahText));
+    currentLessonText=texts.join(" ");
+    document.getElementById("arabicText").innerHTML=texts.map((t,i)=>`<div class="ayah" dir="rtl"><small dir="ltr">${refs[i]}</small>${escapeHtml(t)}</div>`).join("");
+    audioRefs=refs.map(ref=>({ref,url:audioUrl(ref)}));
+    document.getElementById("audioQueue").textContent=`${audioRefs.length} ayah track(s) mapped • Maher Al-Muaiqly`;
+    document.getElementById("lessonBadge").textContent="Text + audio ready";
+  }catch(e){
+    document.getElementById("arabicText").innerHTML='<div class="notice error">'+escapeHtml(e.message)+'</div>';
+    document.getElementById("lessonBadge").textContent="Text unavailable";
+  }
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function audioUrl(ref){
+  const [s,a]=ref.split(":").map(Number);
+  return AUDIO_ROOT+String(s).padStart(3,"0")+String(a).padStart(3,"0")+".mp3";
+}
+async function playCurrentAyah(){
+  if(audioIndex>=audioRefs.length){
+    document.getElementById("audioQueue").textContent="Recitation finished.";
+    return;
+  }
+  const item=audioRefs[audioIndex], p=document.getElementById("player");
+  p.pause();
+  p.src=item.url;
+  p.load();
+  document.getElementById("audioQueue").textContent=`Ready: ${item.ref} • Maher Al-Muaiqly • ${audioIndex+1}/${audioRefs.length}`;
+  try{
+    await p.play();
+    document.getElementById("audioQueue").textContent=`Playing ${item.ref} • Maher Al-Muaiqly • ${audioIndex+1}/${audioRefs.length}`;
+  }catch(e){
+    document.getElementById("audioQueue").textContent=`Tap Listen again to start ${item.ref}. iPhone may require a direct tap for audio.`;
+  }
+}
+document.getElementById("listenBtn").onclick=()=>{audioIndex=0;playCurrentAyah()};
+document.getElementById("player").onended=()=>{
+  if(audioIndex < audioRefs.length-1){
+    audioIndex++;
+    document.getElementById("audioQueue").textContent=`Finished. Tap Listen for next ayah (${audioRefs[audioIndex].ref}).`;
+  }else{
+    audioIndex=audioRefs.length;
+    document.getElementById("audioQueue").textContent="Recitation finished.";
+  }
+};
+document.getElementById("stopAudio").onclick=()=>{const p=document.getElementById("player");p.pause();p.currentTime=0;audioIndex=audioRefs.length};
+document.getElementById("reloadLesson").onclick=()=>loadLesson(currentPage);
+document.getElementById("prevPage").onclick=()=>loadLesson(currentPage-1);
+document.getElementById("nextPage").onclick=()=>loadLesson(currentPage+1);
+
+function normArabic(s){
+  return s.normalize("NFD").replace(/[\\u064B-\\u065F\\u0670\\u06D6-\\u06ED]/g,"").replace(/[إأآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي").replace(/ة/g,"ه").replace(/ـ/g,"").replace(/[^\\u0621-\\u063A\\u0641-\\u064A\\s]/g," ").replace(/\\s+/g," ").trim();
+}
+function tokenDiff(expected,heard){
+  const a=normArabic(expected).split(" ").filter(Boolean),b=normArabic(heard).split(" ").filter(Boolean);
+  const used=new Array(b.length).fill(false),matched=[];
+  a.forEach(w=>{let hit=-1;for(let i=0;i<b.length;i++)if(!used[i]&&b[i]===w){hit=i;break}if(hit>=0){used[hit]=true;matched.push({w,status:"ok"})}else matched.push({w,status:"miss"})});
+  const extras=b.filter((_,i)=>!used[i]);
+  const score=Math.round((matched.filter(x=>x.status==="ok").length/Math.max(1,a.length))*100);
+  return {score,matched,extras};
+}
+if("webkitSpeechRecognition" in window||"SpeechRecognition" in window){
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new R();recognition.lang="ar-SA";recognition.interimResults=false;recognition.continuous=false;
+  recognition.onstart=()=>document.getElementById("recStatus").textContent="Listening… recite the lesson without looking.";
+  recognition.onresult=e=>{
+    const heard=Array.from(e.results).map(x=>x[0].transcript).join(" ");
+    const d=tokenDiff(currentLessonText,heard);
+    document.getElementById("recResult").innerHTML=`<div class="score">${d.score}% approximate match</div><div class="small">Heard: ${escapeHtml(heard)}</div>`;
+    document.getElementById("recCompare").innerHTML=d.matched.map(x=>`<span class="word ${x.status==="ok"?"okw":"miss"}" dir="rtl">${escapeHtml(x.w)}</span>`).join("")+
+      d.extras.map(x=>`<span class="word extra" dir="rtl">+${escapeHtml(x)}</span>`).join("");
+    document.getElementById("recStatus").textContent="Practice comparison complete.";
+  };
+  recognition.onerror=e=>document.getElementById("recStatus").textContent="Recognition error: "+e.error;
+  recognition.onend=()=>{if(document.getElementById("recStatus").textContent.startsWith("Listening"))document.getElementById("recStatus").textContent="Recognition stopped."};
+}
+document.getElementById("startRec").onclick=()=>{if(!recognition){document.getElementById("recStatus").textContent="Speech recognition is not supported in this browser.";return}try{recognition.start()}catch(e){}};
+document.getElementById("stopRec").onclick=()=>recognition?.stop();
+
+function dueReviews(){
+  const today=iso(todayDate()),out=[];
+  Object.values(state.lessons).forEach(l=>{
+    [0,1,7,30].forEach((n,i)=>{if(l.reviewDates?.[i]===today)out.push({...l,stage:n})});
+  });
+  return out;
+}
+function renderRevision(){
+  const due=dueReviews(),weak=Object.entries(state.weak).sort((a,b)=>b[1].count-a[1].count);
+  let html=due.length?due.map(x=>`<div class="row"><span><strong>${x.key}</strong><br><span class="small">${x.stage===0?"Same day":x.stage+"-day review"}</span></span><span class="badge warn">Due</span></div>`).join(""):"<div class='notice'>No scheduled spaced-repetition items due today.</div>";
+  if(weak.length)html+=`<h3 style="margin-top:18px">Mistake Bank</h3>`+weak.map(([k,v])=>`<div class="row"><span>${escapeHtml(k)}<br><span class="small">Last: ${v.last||""}</span></span><span class="badge bad">${v.count} weak</span></div>`).join("");
+  document.getElementById("revisionQueue").innerHTML=html;
+}
+function renderSchedule(){
+  const q=(document.getElementById("scheduleSearch").value||"").toLowerCase(),rows=planForDate(todayDate(),120);
+  const filtered=rows.filter(r=>(r.date+" "+r.type+" "+r.target+" "+r.workload).toLowerCase().includes(q));
+  const available=learningDays(todayDate(),targetEndDate());
+  const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
+  document.getElementById("scheduleSummary").textContent=`Remaining: ${remaining} lines • learning days to target: ${available} • adaptive requirement: ${Math.ceil(remaining/Math.max(1,available))} lines/day on average • target end: ${fmtDate(iso(targetEndDate()))}`;
+  document.getElementById("scheduleBody").innerHTML=filtered.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.type}</td><td class="lineTarget">${r.target}</td><td>${r.workload}</td><td><span class="badge ${r.type.includes("revision")||r.type.includes("test")?"warn":""}">${state.history.find(h=>h.date===r.date)?.label||"Planned"}</span></td></tr>`).join("");
+}
+document.getElementById("scheduleSearch").oninput=renderSchedule;
+
+function renderProgress(){
+  const pct=(state.strongLines/totalLearningLines*100).toFixed(1),loc=cursorToLoc(state.cursor);
+  document.getElementById("healthBox").innerHTML=`
+    <div class="row"><span>Strong / verified lines</span><strong>${state.strongLines}</strong></div>
+    <div class="row"><span>Passed lines</span><strong>${state.passedLines}</strong></div>
+    <div class="row"><span>Next line</span><strong>P${loc.page} L${loc.line}</strong></div>
+    <div class="row"><span>Coverage</span><strong>${pct}%</strong></div>
+    <div class="row"><span>Weak items</span><strong>${Object.keys(state.weak).length}</strong></div>`;
+  document.getElementById("statsBox").innerHTML=`
+    <div class="row"><span>Total learning lines</span><strong>${totalLearningLines}</strong></div>
+    <div class="row"><span>Mode</span><strong>${modes[state.mode].label}</strong></div>
+    <div class="row"><span>Base pace</span><strong>${modes[state.mode].base} lines/day</strong></div>
+    <div class="row"><span>Friday</span><strong>Protected revision/test</strong></div>
+    <div class="row"><span>Month-end</span><strong>Protected monthly test</strong></div>`;
+}
+function saveResult(){
+  const score=clamp(Number(document.getElementById("scoreInput").value)||0,0,100);
+  const planned=Math.max(0,currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0);
+  let actual=Number(document.getElementById("actualLinesInput").value);
+  if(!actual)actual=planned;
+  actual=clamp(actual,0,planned+20);
+  const date=iso(todayDate()),key=currentTask?.target||`P${currentPage}`;
+  let label=score<75?"Not passed — repeat / carry forward":score<90?"Passed — extra revision":"Strong — advance";
+  const entry={date,label,key,score,actual,type:document.getElementById("resultType").value,note:document.getElementById("resultNote").value};
+  state.history.push(entry);state.results=state.results||{};state.results[date]=entry;
+  if(score>=75&&actual>0){
+    state.cursor=Math.min(totalLearningLines+1,state.cursor+actual);
+    state.passedLines=Math.min(totalLearningLines,state.passedLines+actual);
+    if(score>=90)state.strongLines=Math.min(totalLearningLines,state.strongLines+actual);
+    const loc=cursorToLoc(Math.max(1,state.cursor-actual));
+    const reviewKey=`P${loc.page} L${loc.line}–${loc.line+actual-1}`;
+    state.lessons[reviewKey]={key:reviewKey,learnedAt:date,reviewDates:[date,iso(addDays(todayDate(),1)),iso(addDays(todayDate(),7)),iso(addDays(todayDate(),30))]};
+  }else{
+    state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date;
+  }
+  if(state.lastDate!==date){
+    state.streak=(state.lastDate&&Math.abs(new Date(date)-new Date(state.lastDate))===86400000)?(state.streak||0)+1:1;
+    state.lastDate=date;
+  }
+  save();renderAll();
+  document.getElementById("resultMsg").textContent=label+" • adaptive schedule recalculated from your actual progress.";
+}
+document.getElementById("saveResult").onclick=saveResult;
+document.getElementById("actualLinesInput").onfocus=()=>{if(!Number(document.getElementById("actualLinesInput").value)){document.getElementById("actualLinesInput").value=currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0}};
+document.getElementById("openLesson").onclick=()=>setTab("lesson");
+document.getElementById("openRevision").onclick=()=>setTab("revision");
+document.getElementById("exportBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="quran-hifz-progress-v4.json";a.click()};
+document.getElementById("resetBtn").onclick=()=>{if(confirm("Reset all local progress?")){localStorage.removeItem(STORAGE);location.reload()}};
+
+
+function environmentCheck(){
+  const isFile = location.protocol === "file:";
+  if(isFile){
+    const n=document.createElement("div");
+    n.className="notice error";
+    n.style.margin="12px 0";
+    n.innerHTML="<strong>iPhone setup:</strong> This app is designed to run from an HTTPS web address (GitHub Pages), not as a local HTML file opened from Files/WhatsApp. Please open the hosted link in Safari. Local-file restrictions can block live Quran text/audio requests.";
+    document.querySelector(".app").prepend(n);
+  }
+}
+
+function renderAll(){renderHeader();renderToday();renderRevision();renderProgress()}
+renderAll();
+environmentCheck();
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+loadPageRanges().then(()=>loadLesson(2));
+</script>
+</body>
+</html>

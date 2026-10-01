@@ -1,0 +1,10 @@
+{
+  "name": "Quran Hifz Companion",
+  "short_name": "Hifz Companion",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f4",
+  "theme_color": "#146b4b",
+  "description": "Adaptive Quran Hifz planner with Mushaf page mapping, Arabic lesson text, revision and Qari audio."
+}
