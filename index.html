@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Quran Hifz Companion V4 — iPhone</title>
+<title>Quran Hifz Companion V10</title>
 <style>
 :root{--bg:#f5f7f4;--card:#fff;--ink:#172019;--muted:#69736b;--green:#146b4b;--green2:#e2f2e9;--line:#dce4dd;--red:#a53b3b;--amber:#986900;--shadow:0 8px 30px rgba(20,40,28,.08)}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}
@@ -22,7 +22,7 @@ h1,h2,h3{margin-top:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);ga
 .ayah{padding:9px 4px;border-bottom:1px solid #eee9dc}.ayah:last-child{border-bottom:0}.ayah small{display:block;direction:ltr;text-align:left;color:var(--muted);font-size:11px;margin-bottom:3px}
 .mushafFrame{width:100%;height:700px;border:1px solid #e6e0cf;border-radius:16px;background:#fbfaf5}.openingFrame{height:520px}.notice{padding:11px 13px;border-radius:12px;background:#f0f4f0;color:#4f5a52;font-size:13px}.error{background:#fae9e9;color:#8f3030}
 .audio{width:100%;margin-top:10px}.tablewrap{max-height:650px;overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:9px;border-bottom:1px solid var(--line);text-align:left}.table th{position:sticky;top:0;background:#f4f7f4}
-select,input{border:1px solid var(--line);border-radius:10px;padding:9px;background:white}.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.small{font-size:12px;color:var(--muted)}.hidden{display:none}.source{font-size:11px;color:var(--muted);margin-top:10px}.score{font-size:30px;font-weight:850}.word{display:inline-block;margin:2px 3px;padding:2px 4px;border-radius:5px}.word.okw{background:#e5f4ea}.word.miss{background:#fae5e5}.word.extra{background:#fff0cf}
+select,input{border:1px solid var(--line);border-radius:10px;padding:9px;background:white}.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.small{font-size:12px;color:var(--muted)}.hidden{display:none}.source{font-size:11px;color:var(--muted);margin-top:10px}.score{font-size:30px;font-weight:850}.word{display:inline-block;margin:2px 3px;padding:2px 4px;border-radius:5px}.word.okw{background:#e5f4ea}.word.miss{background:#fae5e5}.word.extra{background:#fff0cf}.revCard{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:#fff}.revCard.selected{outline:2px solid var(--accent)}.revText{max-height:260px;overflow:auto;background:#fafafa;border-radius:10px;padding:10px;margin-top:10px}.revScore{font-size:25px;font-weight:850}.revCompare{max-height:140px;overflow:auto;margin-top:8px}
 .lineTarget{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.mini{font-size:12px;padding:7px 9px;border-radius:9px;background:#edf2ee;border:0}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.app{padding:14px}.arabic{font-size:25px}.mushafFrame{height:620px}}
 
@@ -57,7 +57,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 <body>
 <div class="app">
 <header class="top">
-  <div><div class="brand">🕌 Quran Hifz Companion</div><div class="sub">V5 • Adaptive Hifz planner • iPhone edition</div></div>
+  <div><div class="brand">🕌 Quran Hifz Companion</div><div class="sub">V10 • Adaptive Hifz planner • iPhone / Android / laptop</div></div>
   <div class="pill">Online Quran content</div>
 </header>
 
@@ -88,6 +88,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 <section id="tab-today">
 <div class="grid">
   <div class="card"><h2>Today's Hifz</h2><div id="todayCard"></div>
+    <div id="todaySessionBox" class="notice" style="margin-top:10px"></div>
     <div class="actions" style="margin-top:14px"><button class="primary" id="openLesson">📖 Open Lesson</button><button class="secondary" id="openRevision">🔁 Revision Queue</button></div>
   </div>
   <div class="card"><h2>Smart Rules</h2>
@@ -120,10 +121,15 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
     <div class="card" style="margin-top:16px;padding:14px;background:#fafcf9">
       <h3>Recitation Practice</h3>
       <div class="small">Speech recognition is only a practice aid. It is not a Tajweed or makharij authority.</div>
-      <div class="actions" style="margin-top:9px"><button class="primary" id="startRec">🎙 Start recitation</button><button class="secondary" id="stopRec">Stop</button></div>
-      <div id="recStatus" class="notice" style="margin-top:9px">Ready.</div>
+      <div class="actions" style="margin-top:9px"><button class="primary" id="startRec">🎙 Start recitation</button><button class="secondary" id="stopRec">■ Stop & score</button><button class="primary hidden" id="saveLessonResult">✓ Save verified result</button></div>
+      <div id="recStatus" class="notice" style="margin-top:9px">Ready. Recite first, then use Stop & score.</div>
       <div id="recResult" style="margin-top:9px"></div>
       <div id="recCompare" style="margin-top:9px"></div>
+      <div id="nextLessonPrompt" class="notice hidden" style="margin-top:12px"></div>
+      <div class="actions" style="margin-top:9px">
+        <button class="primary hidden" id="continueTodayBtn">▶ Continue with next lesson today</button>
+        <button class="secondary hidden" id="finishTodayBtn">Finish for today</button>
+      </div>
     </div>
   </div>
 
@@ -142,7 +148,18 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 
 <section id="tab-revision" class="hidden">
 <div class="grid">
-  <div class="card"><h2>Revision Queue</h2><div id="revisionQueue"></div></div>
+  <div class="card"><h2>Last 6 Lessons — Revision Test</h2>
+    <div class="notice">These are your six most recent completed new-learning lessons. Revision scores are recorded for self-monitoring only; they do <strong>not</strong> move the Hifz cursor or change the new-learning schedule.</div>
+    <div id="revisionLessons"></div>
+  </div>
+  <div class="card"><h2>Selected Revision Lesson</h2>
+    <div id="revisionSelected" class="notice">Select one of the six lessons to read it, listen to it, and recite it.</div>
+    <div class="actions" style="margin-top:10px"><button class="secondary" id="revListenBtn">🔊 Listen</button><button class="secondary" id="revStopAudio">■ Stop</button><button class="primary" id="revStartRec">🎙 Start revision</button><button class="secondary" id="revStopRec">■ Stop & score</button></div>
+    <div id="revAudioStatus" class="small" style="margin-top:8px"></div>
+    <div id="revStatus" class="small" style="margin-top:8px">No revision test started.</div>
+    <div id="revResult" style="margin-top:10px"></div>
+    <div id="revCompare" class="revCompare"></div>
+  </div>
   <div class="card"><h2>Revision Cycle</h2>
     <div class="row"><span>Same day</span><span class="badge">After lesson</span></div>
     <div class="row"><span>Next day</span><span class="badge">1 day</span></div>
@@ -150,6 +167,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
     <div class="row"><span>30-day</span><span class="badge">30 days</span></div>
     <div class="row"><span>Friday</span><span class="badge warn">Weekly test</span></div>
     <div class="row"><span>Month-end</span><span class="badge warn">Monthly test</span></div>
+    <div class="notice" style="margin-top:10px">Revision rating is informational only for now. A 90%, 70%, or 50% result is saved so you can decide where to focus.</div>
   </div>
 </div>
 </section>
@@ -196,7 +214,7 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 </div>
 </section>
 
-<div class="source" style="margin:18px 2px 0">Quran Hifz Companion • Final build 7 • QUL documents its Qudratullah layout as 610 pages / 15 lines. This app uses QUL as the page/ayah reference for pages 3–610 and uses the user's Pakistani-print scan as the opening-page reference. Arabic text is fetched by ayah and audio is streamed by ayah.</div>
+<div class="source" style="margin:18px 2px 0">Quran Hifz Companion • Final build 10.1 • QUL documents its Qudratullah layout as 610 pages / 15 lines. This app uses QUL as the page/ayah reference for pages 3–610 and uses the user's Pakistani-print scan as the opening-page reference. Arabic text is fetched by ayah and audio is streamed by ayah.</div>
 </div>
 
 <div id="startDateModal" class="modalOverlay hidden">
@@ -213,13 +231,14 @@ select,input{border:1px solid var(--line);border-radius:10px;padding:9px;backgro
 
 <script>
 const DEVICE="iPhone";
-const APP_VERSION=8;
+const APP_VERSION=10;
 const STORAGE="qhc_final_"+DEVICE;
 const QUL_BASE="https://qul.tarteel.ai/mushaf_layouts/6?page_number=";
 const QUL_INDEX_PROXY="https://r.jina.ai/https://qul.tarteel.ai/mushaf_layouts/6";
 const QURAN_API="https://api.alquran.cloud/v1";
 const AUDIO_ROOT="https://everyayah.com/data/MaherAlMuaiqly128kbps/";
 const ARCHIVE_BASE="https://archive.org/details/QuranMajeed-15Lines-PakistaniPrint";
+const ARCHIVE_EMBED="https://archive.org/embed/QuranMajeed-15Lines-PakistaniPrint";
 const totalPages=610, totalLearningLines=9126;
 const modes={
   sustainable:{label:"Sustainable ~5 years",targetDays:1825,base:5},
@@ -254,112 +273,57 @@ function locSegments(cursor,count){
 }
 let state=JSON.parse(localStorage.getItem(STORAGE)||"null")||{
   mode:"sustainable",startDate:null,cursor:1,strongLines:0,passedLines:0,streak:0,lastDate:null,
-  weak:{},history:[],lessons:{},results:{},pageRanges:null,textCache:{},schemaVersion:APP_VERSION
+  weak:{},history:[],lessons:{},results:{},dailyResults:{},pageRanges:null,textCache:{},schemaVersion:APP_VERSION
 };
 if(!Object.prototype.hasOwnProperty.call(state,"startDate")) state.startDate=null;
 if(!state.results) state.results={};
+if(!state.dailyResults) state.dailyResults={};
+Object.keys(state.results||{}).forEach(date=>{
+  if(!state.dailyResults[date]) state.dailyResults[date]=Array.isArray(state.results[date])?state.results[date]:[state.results[date]];
+});
 if(!state.weak) state.weak={};
 if(!state.history) state.history=[];
 if(!state.lessons) state.lessons={};
-if(!state.schemaVersion || state.schemaVersion<APP_VERSION){
-  state.schemaVersion=APP_VERSION;
-  localStorage.setItem(STORAGE,JSON.stringify(state));
-}
-let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="",testEvidence=false;
+state.schemaVersion=APP_VERSION;
+localStorage.setItem(STORAGE,JSON.stringify(state));
+let currentPage=2,currentTask=null,audioRefs=[],audioIndex=0,recognition=null,currentLessonText="",currentLessonRefs=[],testEvidence=false;
+let revisionSelected=null,revisionRefs=[],revisionAudioRefs=[],revisionAudioIndex=0,revisionRecognition=null,revisionTranscript="",revisionInterim="",revisionExpectedText="",revisionStopRequested=false,revisionScored=false;
+let recognitionTranscript="",recognitionInterim="",recognitionStopRequested=false,recognitionScored=false;
 function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
-function learningDays(a,b){
-  let n=0;
-  for(let d=new Date(a);d<=b;d=addDays(d,1)) if(d.getDay()!==5)n++;
-  return n;
-}
-function targetEndDate(){
-  const start=parseLocalDate(state.startDate||iso(todayDate()));
-  return addDays(start,modes[state.mode].targetDays-1);
-}
+function dayResults(date){const arr=state.dailyResults?.[date];if(Array.isArray(arr))return arr;return arr?[arr]:[]}
+function pushDayResult(date,entry){if(!state.dailyResults[date])state.dailyResults[date]=[];state.dailyResults[date].push(entry);state.results[date]=entry}
+function completedTodayLines(date=iso(todayDate())){return dayResults(date).filter(x=>x&&x.type!=="Practice only"&&Number(x.actual)>0&&x.label!=="Not passed — repeat / carry forward").reduce((n,x)=>n+Number(x.actual||0),0)}
+function learningDays(a,b){let n=0;for(let d=new Date(a);d<=b;d=addDays(d,1))if(d.getDay()!==5)n++;return n}
+function targetEndDate(){const start=parseLocalDate(state.startDate||iso(todayDate()));return addDays(start,modes[state.mode].targetDays-1)}
+function basePlannedLines(d,cursor){const end=targetEndDate(),available=Math.max(1,learningDays(d,end)),remaining=Math.max(0,totalLearningLines-(cursor-1)),needed=Math.ceil(remaining/available);let planned=Math.max(1,modes[state.mode].base,needed);if(iso(d)===iso(parseLocalDate(state.startDate||iso(todayDate())))&&cursor===1)planned=6;return Math.min(planned,remaining)}
 function planForDate(startDate,horizonDays=45){
-  const rows=[],end=targetEndDate();
-  const scheduleStart=parseLocalDate(state.startDate||iso(todayDate()));
-  const requestedStart=parseLocalDate(startDate);
-  const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
-  let cursor=state.cursor;
+  const rows=[],end=targetEndDate(),scheduleStart=parseLocalDate(state.startDate||iso(todayDate())),requestedStart=parseLocalDate(startDate);let cursor=state.cursor;
   for(let i=0;i<horizonDays;i++){
-    const d=addDays(requestedStart,i), isoD=iso(d);
-    if(d<scheduleStart){
-      rows.push({date:isoD,type:"Before start",target:"Hifz schedule has not started",workload:"No lesson",segments:[]});
-      continue;
-    }
-    const isFirstDay=isoD===iso(scheduleStart);
-    const savedToday=state.results?.[isoD];
-    if(savedToday){
-      rows.push({date:isoD,type:"Completed",target:savedToday.key||"Today's lesson completed",workload:`${savedToday.actual||0} lines completed • ${savedToday.score||0}%`,segments:[]});
-      continue;
-    }
-    if(!isFirstDay && d.getDay()===5){rows.push({date:isoD,type:isMonthEnd(d)?"Monthly test":"Weekly revision/test",target:"Revision / test",workload:"No new lesson",segments:[]});continue}
+    const d=addDays(requestedStart,i),isoD=iso(d),saved=dayResults(isoD),successful=saved.filter(x=>x&&x.type!=="Practice only"&&Number(x.actual)>0&&x.label!=="Not passed — repeat / carry forward"),failed=saved.filter(x=>x&&x.label==="Not passed — repeat / carry forward");
+    if(d<scheduleStart){rows.push({date:isoD,type:"Before start",target:"Hifz schedule has not started",workload:"No lesson",segments:[]});continue}
+    if(d.getDay()===5){rows.push({date:isoD,type:isMonthEnd(d)?"Monthly test":"Weekly revision/test",target:"Revision / test",workload:"No new lesson",segments:[],statusText:successful.length?`${successful.length} test(s) recorded`:"Protected revision/test"});continue}
+    const remaining=Math.max(0,totalLearningLines-(cursor-1));
     if(remaining<=0){rows.push({date:isoD,type:"Complete",target:"Quran completed",workload:"Revision only",segments:[]});continue}
-    const available=Math.max(1,learningDays(d,end));
-    const needed=Math.ceil((totalLearningLines-(cursor-1))/available);
-    let planned=Math.max(1,needed);
-    if(isFirstDay && cursor===1)planned=6;
-    const segments=locSegments(cursor,planned);
-    cursor+=planned;
-    rows.push({date:isoD,type:"New lesson",target:segments.map(x=>x.label).join(" + "),workload:planned+" new lines",segments});
+    /* state.cursor already contains every verified result saved so far, including
+       today's successful sessions. Never count today's result twice. */
+    const remainingAfter=Math.max(0,totalLearningLines-(cursor-1));
+    if(remainingAfter<=0){rows.push({date:isoD,type:"Complete",target:"Quran completed",workload:"Revision only",segments:[],statusText:`${successful.length} lesson(s) completed`});continue}
+    const planned=basePlannedLines(d,cursor),segments=locSegments(cursor,planned),isToday=isoD===iso(todayDate());
+    if(successful.length && !isToday){rows.push({date:isoD,type:"Completed",target:successful.map(x=>x.key).join(" • "),workload:`${successful.reduce((n,x)=>n+Number(x.actual||0),0)} lines completed`,segments:[],statusText:`${successful.length} lesson(s) completed`});continue}
+    rows.push({date:isoD,type:"New lesson",target:segments.map(x=>x.label).join(" + "),workload:planned+" new lines",segments,completedCount:successful.length,sessionCount:saved.length,statusText:successful.length?`${successful.length} lesson(s) completed • next lesson available`:failed.length?`${failed.length} failed attempt • carries forward`:"Planned"});
+    /* Project future planned lessons forward. Today itself remains anchored to the
+       verified state.cursor so a missed/failed lesson carries forward unchanged. */
+    if(!isToday)cursor+=planned;
   }
   return rows;
 }
-function renderHeader(){
-  const d=todayDate(),pct=(state.strongLines/totalLearningLines*100);
-  document.getElementById("todayTitle").textContent="Today • "+fmtDate(iso(d));
-  document.getElementById("todaySub").textContent=modes[state.mode].label+" • starts "+fmtDate(state.startDate||iso(todayDate()))+" • adaptive scheduling ON";
-  const sd=document.getElementById("settingsStartDate"); if(sd) sd.value=state.startDate||"";
-  document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===state.mode));
-  document.getElementById("planSelect").value=state.mode;
-  document.getElementById("settingsMode").value=state.mode;
-  document.getElementById("strongLines").textContent=state.strongLines;
-  document.getElementById("progressPct").textContent=pct.toFixed(1)+"%";
-  document.getElementById("progressBar").style.width=Math.min(100,pct)+"%";
-  document.getElementById("weakLines").textContent=Object.keys(state.weak).length;
-  document.getElementById("streak").textContent=state.streak||0;
-}
-function activeRow(){
-  if(!state.startDate) return {type:"Setup required",target:"Choose your Hifz start date in Settings",workload:"—",segments:[]};
-  const rows=planForDate(todayDate(),1);
-  return rows[0];
-}
-function renderToday(){
-  const r=activeRow();currentTask=r;
-  if(r?.segments?.length)currentPage=r.segments[0].page;
-  const due=dueReviews().length;
-  document.getElementById("todayCard").innerHTML=`
-    <div class="row"><span>Plan</span><strong>${r.type}</strong></div>
-    <div class="row"><span>Target</span><strong class="lineTarget">${r.target}</strong></div>
-    <div class="row"><span>Workload</span><strong>${r.workload}</strong></div>
-    <div class="row"><span>Revision due</span><strong>${due} item(s)</strong></div>
-    <div class="row"><span>Start date</span><strong>${state.startDate?fmtDate(state.startDate):"Not set"}</strong></div>
-    <div class="row"><span>Target completion</span><strong>${state.startDate?fmtDate(iso(targetEndDate())):"Set start date first"}</strong></div>`;
-}
-function setTab(name){
-  document.querySelectorAll("[id^=tab-]").forEach(x=>x.classList.add("hidden"));
-  document.getElementById("tab-"+name).classList.remove("hidden");
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
-  if(name==="lesson")loadLesson(currentPage);
-  if(name==="revision")renderRevision();
-  if(name==="schedule")renderSchedule();
-  if(name==="progress")renderProgress();
-}
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
-document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=`Mode changed to ${modes[state.mode].label}. Schedule recalculated from your current verified progress; no progress was added.`;});
-document.getElementById("planSelect").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule()};
-document.getElementById("settingsMode").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=`Mode changed to ${modes[state.mode].label}. Schedule recalculated from your current verified progress; no progress was added.`;};
-document.getElementById("settingsStartDate").onchange=e=>{if(e.target.value){state.startDate=e.target.value;save();renderAll();renderSchedule();}};
-
-document.getElementById("saveStartDate").onclick=()=>{
-  const v=document.getElementById("startDateInput").value;
-  if(!v){document.getElementById("startDateError").classList.remove("hidden");return;}
-  state.startDate=v; save();
-  document.getElementById("startDateModal").classList.add("hidden");
-  renderAll(); renderSchedule();
-};
-
+function renderHeader(){const d=todayDate(),pct=state.strongLines/totalLearningLines*100;document.getElementById("todayTitle").textContent="Today • "+fmtDate(iso(d));document.getElementById("todaySub").textContent=modes[state.mode].label+" • starts "+fmtDate(state.startDate||iso(todayDate()))+" • adaptive scheduling ON";const sd=document.getElementById("settingsStartDate");if(sd)sd.value=state.startDate||"";document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===state.mode));document.getElementById("planSelect").value=state.mode;document.getElementById("settingsMode").value=state.mode;document.getElementById("strongLines").textContent=state.strongLines;document.getElementById("progressPct").textContent=pct.toFixed(1)+"%";document.getElementById("progressBar").style.width=Math.min(100,pct)+"%";document.getElementById("weakLines").textContent=Object.keys(state.weak).length;document.getElementById("streak").textContent=state.streak||0}
+function activeRow(){if(!state.startDate)return{type:"Setup required",target:"Choose your Hifz start date in Settings",workload:"—",segments:[]};return planForDate(todayDate(),1)[0]}
+function renderToday(){const r=activeRow();currentTask=r;if(r?.segments?.length)currentPage=r.segments[0].page;const date=iso(todayDate()),results=dayResults(date),tested=results.filter(x=>x.type!=="Practice only"),passed=tested.filter(x=>x.label!=="Not passed — repeat / carry forward");document.getElementById("todayCard").innerHTML=`<div class="row"><span>Plan</span><strong>${r.type}</strong></div><div class="row"><span>Target</span><strong class="lineTarget">${r.target}</strong></div><div class="row"><span>Workload</span><strong>${r.workload}</strong></div><div class="row"><span>Revision due</span><strong>${dueReviews().length} item(s)</strong></div><div class="row"><span>Start date</span><strong>${state.startDate?fmtDate(state.startDate):"Not set"}</strong></div><div class="row"><span>Target completion</span><strong>${state.startDate?fmtDate(iso(targetEndDate())):"Set start date first"}</strong></div>`;const box=document.getElementById("todaySessionBox");box.innerHTML=results.length?`<strong>Today's Hifz sessions:</strong> ${passed.length} passed/advanced • ${tested.length} tested • ${completedTodayLines(date)} lines verified.`:"<strong>Today's Hifz sessions:</strong> none completed yet. Recite the current lesson to generate a score."}
+function setTab(name){document.querySelectorAll("[id^=tab-]").forEach(x=>x.classList.add("hidden"));document.getElementById("tab-"+name).classList.remove("hidden");document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));if(name==="lesson")loadLesson(currentPage);if(name==="revision")renderRevision();if(name==="schedule")renderSchedule();if(name==="progress")renderProgress()}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=`Mode changed to ${modes[state.mode].label}. Schedule recalculated from your current verified progress; no progress was added.`});document.getElementById("planSelect").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule()};document.getElementById("settingsMode").onchange=e=>{state.mode=e.target.value;save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=`Mode changed to ${modes[state.mode].label}. Schedule recalculated from your current verified progress; no progress was added.`};document.getElementById("settingsStartDate").onchange=e=>{if(e.target.value){state.startDate=e.target.value;save();renderAll();renderSchedule()}};document.getElementById("saveStartDate").onclick=()=>{const v=document.getElementById("startDateInput").value;if(!v){document.getElementById("startDateError").classList.remove("hidden");return}state.startDate=v;save();document.getElementById("startDateModal").classList.add("hidden");renderAll();renderSchedule()};
+function renderSchedule(){const q=(document.getElementById("scheduleSearch").value||"").toLowerCase();if(!state.startDate){document.getElementById("scheduleSummary").textContent="Choose a Hifz start date to generate your schedule.";document.getElementById("scheduleBody").innerHTML="<tr><td colspan=5 style=\"padding:18px\">No schedule yet. Choose your Start Date first.</td></tr>";return}const start=parseLocalDate(state.startDate),viewStart=todayDate()<start?start:todayDate(),rows=planForDate(viewStart,120),filtered=rows.filter(r=>(r.date+" "+r.type+" "+r.target+" "+r.workload).toLowerCase().includes(q)),endForAverage=targetEndDate(),available=learningDays(viewStart,endForAverage),remaining=Math.max(0,totalLearningLines-(state.cursor-1)),required=Math.ceil(remaining/Math.max(1,available));document.getElementById("scheduleSummary").textContent=`${modes[state.mode].label} • Start: ${fmtDate(state.startDate)} • Remaining: ${remaining} lines • learning days to target: ${available} • required average: ${required} lines/day • target end: ${fmtDate(iso(targetEndDate()))}`;document.getElementById("scheduleBody").innerHTML=filtered.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.type}</td><td class="lineTarget">${r.target}</td><td>${r.workload}</td><td><span class="badge ${r.type.toLowerCase().includes("revision")||r.type.toLowerCase().includes("test")?"warn":""}">${r.statusText||"Planned"}</span></td></tr>`).join("")}
+document.getElementById("scheduleSearch").oninput=renderSchedule;
 function parseRangeText(t){
   const m=t.match(/\|\s*(\d+)\s*\|\s*(\d+:\d+)\s*-\s*(\d+:\d+)\s*\|/);
   return m?{page:+m[1],from:m[2],to:m[3]}:null;
@@ -403,7 +367,8 @@ async function fetchAyahText(ref){
   state.textCache[ref]=txt;save();return txt;
 }
 async function loadLesson(page){
-  testEvidence=false;
+  testEvidence=false; recognitionTranscript=""; recognitionInterim=""; recognitionStopRequested=false; recognitionScored=false;
+  const saveLessonBtn=document.getElementById("saveLessonResult"); if(saveLessonBtn) saveLessonBtn.classList.add("hidden");
   const cb=document.getElementById("confirmTestDone"); if(cb) cb.checked=false;
   const si=document.getElementById("scoreInput"); if(si) si.value="";
   const ai=document.getElementById("actualLinesInput"); if(ai) ai.value="";
@@ -415,7 +380,7 @@ async function loadLesson(page){
   const frame=document.getElementById("mushafFrame");
   if(currentPage<=2){
     frame.className="mushafFrame openingFrame";
-    frame.src=ARCHIVE_BASE+"/page/n"+(currentPage-1)+"/mode/1up";
+    frame.src=ARCHIVE_EMBED+"?ui=embed#page/n"+(currentPage-1)+"/mode/1up";
     document.getElementById("sourceLink").href=frame.src;
     document.getElementById("mushafNotice").textContent="Opening page uses the Pakistani-print scan source so the 6-line opening layout is preserved.";
   }else{
@@ -435,6 +400,7 @@ async function loadLesson(page){
   try{
     const texts=await Promise.all(refs.map(fetchAyahText));
     currentLessonText=texts.join(" ");
+    currentLessonRefs=refs.slice();
     document.getElementById("arabicText").innerHTML=texts.map((t,i)=>`<div class="ayah" dir="rtl"><small dir="ltr">${refs[i]}</small>${escapeHtml(t)}</div>`).join("");
     audioRefs=refs.map(ref=>({ref,url:audioUrl(ref)}));
     document.getElementById("audioQueue").textContent=`${audioRefs.length} ayah track(s) mapped • Maher Al-Muaiqly`;
@@ -482,39 +448,47 @@ document.getElementById("prevPage").onclick=()=>loadLesson(currentPage-1);
 document.getElementById("nextPage").onclick=()=>loadLesson(currentPage+1);
 
 function normArabic(s){
-  return s.normalize("NFD").replace(/[\\u064B-\\u065F\\u0670\\u06D6-\\u06ED]/g,"").replace(/[إأآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي").replace(/ة/g,"ه").replace(/ـ/g,"").replace(/[^\\u0621-\\u063A\\u0641-\\u064A\\s]/g," ").replace(/\\s+/g," ").trim();
+  return s.normalize("NFD").replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g,"").replace(/[إأآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي").replace(/ة/g,"ه").replace(/ـ/g,"").replace(/[^\u0621-\u063A\u0641-\u064A\s]/g," ").replace(/\s+/g," ").trim();
 }
-function tokenDiff(expected,heard){
-  const a=normArabic(expected).split(" ").filter(Boolean),b=normArabic(heard).split(" ").filter(Boolean);
-  const used=new Array(b.length).fill(false),matched=[];
-  a.forEach(w=>{let hit=-1;for(let i=0;i<b.length;i++)if(!used[i]&&b[i]===w){hit=i;break}if(hit>=0){used[hit]=true;matched.push({w,status:"ok"})}else matched.push({w,status:"miss"})});
-  const extras=b.filter((_,i)=>!used[i]);
-  const score=Math.round((matched.filter(x=>x.status==="ok").length/Math.max(1,a.length))*100);
-  return {score,matched,extras};
-}
-if("webkitSpeechRecognition" in window||"SpeechRecognition" in window){
-  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recognition=new R();recognition.lang="ar-SA";recognition.interimResults=false;recognition.continuous=false;
-  recognition.onstart=()=>document.getElementById("recStatus").textContent="Listening… recite the lesson without looking.";
-  recognition.onresult=e=>{
-    const heard=Array.from(e.results).map(x=>x[0].transcript).join(" ");
-    const d=tokenDiff(currentLessonText,heard);
+function tokenDiff(expected,heard){const a=normArabic(expected).split(" ").filter(Boolean),b=normArabic(heard).split(" ").filter(Boolean),n=a.length,m=b.length,dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);const matched=[],used=new Array(m).fill(false);let i=0,j=0;while(i<n){if(j<m&&a[i]===b[j]){matched.push({w:a[i],status:"ok"});used[j]=true;i++;j++}else if(j<m&&dp[i][j+1]>=dp[i+1][j])j++;else{matched.push({w:a[i],status:"miss"});i++}}const extras=b.filter((_,idx)=>!used[idx]),score=Math.round(matched.filter(x=>x.status==="ok").length/Math.max(1,a.length)*100);return{score,matched,extras}}
+function showRecognitionResult(heard,finalize=true){
+  heard=(heard||"").trim();
+  if(!heard){
+    document.getElementById("recStatus").textContent="No speech result was returned. Please try again.";
+    document.getElementById("recResult").innerHTML="<div class='notice error'>I heard no recognizable Arabic text. No score was recorded.</div>";
+    document.getElementById("saveLessonResult").classList.add("hidden");
+    return false;
+  }
+  const d=tokenDiff(currentLessonText,heard);
+  document.getElementById("recResult").innerHTML=`<div class="score">${d.score}% approximate match${finalize?" — score ready":" — live"}</div><div class="small">Heard: ${escapeHtml(heard)}</div><div class="small">${d.matched.filter(x=>x.status==="ok").length} expected words matched • ${d.matched.filter(x=>x.status==="miss").length} missing • ${d.extras.length} extra</div>`;
+  document.getElementById("recCompare").innerHTML=d.matched.map(x=>`<span class="word ${x.status==="ok"?"okw":"miss"}" dir="rtl">${escapeHtml(x.w)}</span>`).join("")+d.extras.map(x=>`<span class="word extra" dir="rtl">+${escapeHtml(x)}</span>`).join("");
+  if(finalize){
+    recognitionScored=true;
     testEvidence=true;
     document.getElementById("scoreInput").value=d.score;
     const plannedNow=Math.max(0,currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0);
     document.getElementById("actualLinesInput").value=plannedNow;
     document.getElementById("confirmTestDone").checked=true;
-    document.getElementById("recResult").innerHTML=`<div class="score">${d.score}% approximate match</div><div class="small">Heard: ${escapeHtml(heard)}</div>`;
-    document.getElementById("recCompare").innerHTML=d.matched.map(x=>`<span class="word ${x.status==="ok"?"okw":"miss"}" dir="rtl">${escapeHtml(x.w)}</span>`).join("")+
-      d.extras.map(x=>`<span class="word extra" dir="rtl">+${escapeHtml(x)}</span>`).join("");
-    document.getElementById("recStatus").textContent="Practice comparison complete.";
-  };
-  recognition.onerror=e=>document.getElementById("recStatus").textContent="Recognition error: "+e.error;
-  recognition.onend=()=>{if(document.getElementById("recStatus").textContent.startsWith("Listening"))document.getElementById("recStatus").textContent="Recognition stopped."};
+    document.getElementById("saveLessonResult").classList.remove("hidden");
+    document.getElementById("recStatus").textContent="Practice comparison complete — score is ready. Save the verified result when you are ready.";
+  }else{
+    document.getElementById("recStatus").textContent="Listening… live comparison shown below.";
+  }
+  return true;
 }
-document.getElementById("startRec").onclick=()=>{if(!recognition){document.getElementById("recStatus").textContent="Speech recognition is not supported in this browser.";return}try{recognition.start()}catch(e){}};
-document.getElementById("stopRec").onclick=()=>recognition?.stop();
-
+function initRecognition(){
+  if(!(window.SpeechRecognition||window.webkitSpeechRecognition))return;
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new R(); recognition.lang="ar-SA"; recognition.interimResults=true; recognition.continuous=true; recognition.maxAlternatives=1;
+  recognition.onstart=()=>{recognitionTranscript="";recognitionInterim="";recognitionStopRequested=false;recognitionScored=false;document.getElementById("saveLessonResult").classList.add("hidden");document.getElementById("recResult").innerHTML="";document.getElementById("recCompare").innerHTML="";document.getElementById("recStatus").textContent="Listening… recite the lesson without looking."};
+  recognition.onresult=e=>{let finalText="",interim="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0]?.transcript||"";if(e.results[i].isFinal)finalText+=" "+t;else interim+=" "+t}if(finalText.trim())recognitionTranscript=(recognitionTranscript+" "+finalText).trim();recognitionInterim=interim.trim();const live=(recognitionTranscript+" "+recognitionInterim).trim();if(live)showRecognitionResult(live,false)};
+  recognition.onerror=e=>{const msg=e.error||"unknown";document.getElementById("recStatus").textContent="Recognition error: "+msg;if(msg!=="no-speech")document.getElementById("recResult").innerHTML=`<div class='notice error'>Speech recognition error: ${escapeHtml(msg)}. No result was saved.</div>`};
+  recognition.onend=()=>{const heard=(recognitionTranscript+" "+recognitionInterim).trim();if(recognitionStopRequested&&!recognitionScored){if(heard)showRecognitionResult(heard,true);else if(document.getElementById("recStatus").textContent.startsWith("Stopping"))document.getElementById("recStatus").textContent="Recognition stopped without a speech result. No score was recorded."}else if(!recognitionStopRequested&&document.getElementById("recStatus").textContent.startsWith("Listening")){document.getElementById("recStatus").textContent="Recognition service ended. Press Start again if you want to continue."}};
+}
+initRecognition();
+document.getElementById("startRec").onclick=()=>{if(!recognition){document.getElementById("recStatus").textContent="Speech recognition is not supported in this browser. Use a supported browser with microphone permission.";return}try{recognitionStopRequested=false;recognition.start()}catch(e){document.getElementById("recStatus").textContent="Recognition is already running or unavailable. Press Stop & score, then Start again."}};
+document.getElementById("stopRec").onclick=()=>{if(!recognition){return}recognitionStopRequested=true;document.getElementById("recStatus").textContent="Stopping… finalizing your recitation score…";try{recognition.stop()}catch(e){}};
+document.getElementById("saveLessonResult").onclick=()=>saveResult();
 function dueReviews(){
   const today=iso(todayDate()),out=[];
   Object.values(state.lessons).forEach(l=>{
@@ -522,36 +496,88 @@ function dueReviews(){
   });
   return out;
 }
-function renderRevision(){
-  const due=dueReviews(),weak=Object.entries(state.weak).sort((a,b)=>b[1].count-a[1].count);
-  let html=due.length?due.map(x=>`<div class="row"><span><strong>${x.key}</strong><br><span class="small">${x.stage===0?"Same day":x.stage+"-day review"}</span></span><span class="badge warn">Due</span></div>`).join(""):"<div class='notice'>No scheduled spaced-repetition items due today.</div>";
-  if(weak.length)html+=`<h3 style="margin-top:18px">Mistake Bank</h3>`+weak.map(([k,v])=>`<div class="row"><span>${escapeHtml(k)}<br><span class="small">Last: ${v.last||""}</span></span><span class="badge bad">${v.count} weak</span></div>`).join("");
-  document.getElementById("revisionQueue").innerHTML=html;
-}
-function renderSchedule(){
-  const q=(document.getElementById("scheduleSearch").value||"").toLowerCase();
-  if(!state.startDate){
-    document.getElementById("scheduleSummary").textContent="Choose a Hifz start date to generate your schedule.";
-    document.getElementById("scheduleBody").innerHTML="<tr><td colspan=5 style=\"padding:18px\">No schedule yet. Choose your Start Date first.</td></tr>";
-    return;
+function revisionHistory(){
+  const out=[];
+  const seen=new Set();
+  for(let i=state.history.length-1;i>=0&&out.length<6;i--){
+    const h=state.history[i];
+    if(!h || h.lessonKind!=="new" || !h.key || h.score==null || h.score<75) continue;
+    if(seen.has(h.key)) continue;
+    seen.add(h.key); out.push(h);
   }
-  /* The Schedule tab starts at the user's selected Hifz Start Date (or today if
-     the schedule has already started). Dates before the Start Date are never
-     shown as schedule rows. The Today tab may still say Before start when the
-     selected start date is in the future. */
-  const start=parseLocalDate(state.startDate);
-  const viewStart=todayDate()<start?start:todayDate();
-  const rows=planForDate(viewStart,120);
-  const filtered=rows.filter(r=>(r.date+" "+r.type+" "+r.target+" "+r.workload).toLowerCase().includes(q));
-  const endForAverage=targetEndDate();
-  const available=learningDays(viewStart,endForAverage);
-  const remaining=Math.max(0,totalLearningLines-(state.cursor-1));
-  const required=Math.ceil(remaining/Math.max(1,available));
-  document.getElementById("scheduleSummary").textContent=`${modes[state.mode].label} • Start: ${fmtDate(state.startDate)} • Remaining: ${remaining} lines • learning days to target: ${available} • required average: ${required} lines/day • target end: ${fmtDate(iso(targetEndDate()))}`;
-  document.getElementById("scheduleBody").innerHTML=filtered.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.type}</td><td class="lineTarget">${r.target}</td><td>${r.workload}</td><td><span class="badge ${r.type.toLowerCase().includes("revision")||r.type.toLowerCase().includes("test")?"warn":""}">${state.history.find(h=>h.date===r.date)?.label||"Planned"}</span></td></tr>`).join("");
+  return out;
 }
-document.getElementById("scheduleSearch").oninput=renderSchedule;
-
+function revisionScoreFor(key){
+  return state.history.filter(h=>h&&h.revision===true&&h.key===key&&h.score!=null).slice(-1)[0]||null;
+}
+async function refsForRevision(item){
+  if(item.refs&&item.refs.length)return item.refs.slice();
+  const seg=item.segments&&item.segments[0];
+  const map=await loadPageRanges();
+  if(seg&&map[seg.page]){const r=map[seg.page];return refsBetween(r.from,r.to)}
+  const m=(item.key||"").match(/P(\d+)/); const page=m?Number(m[1]):2;
+  const r=map[page]; return r?refsBetween(r.from,r.to):[];
+}
+async function selectRevision(key){
+  const item=revisionHistory().find(x=>x.key===key); if(!item)return;
+  revisionSelected=item; revisionTranscript=""; revisionInterim=""; revisionExpectedText=""; revisionStopRequested=false; revisionScored=false; revisionRefs=[]; revisionAudioRefs=[]; revisionAudioIndex=0;
+  document.getElementById("revisionSelected").innerHTML=`<strong>${escapeHtml(item.key)}</strong><br><span class="small">Learned: ${escapeHtml(item.date)} • Original score: ${item.score}%</span><div id="revisionTextLoading" class="notice" style="margin-top:8px">Loading revision text…</div>`;
+  try{
+    revisionRefs=await refsForRevision(item);
+    const texts=await Promise.all(revisionRefs.map(fetchAyahText));
+    revisionExpectedText=texts.join(" ");
+    revisionAudioRefs=revisionRefs.map(ref=>({ref,url:audioUrl(ref)}));
+    document.getElementById("revisionSelected").innerHTML=`<strong>${escapeHtml(item.key)}</strong><br><span class="small">Learned: ${escapeHtml(item.date)} • Original score: ${item.score}% • ${revisionRefs.length} ayah track(s)</span><div class="revText" dir="rtl">${texts.map((t,i)=>`<div class="ayah"><small dir="ltr">${revisionRefs[i]}</small>${escapeHtml(t)}</div>`).join("")}</div>`;
+    document.getElementById("revAudioStatus").textContent="Ready • Maher Al-Muaiqly";
+    const rs=revisionScoreFor(item.key);
+    if(rs) document.getElementById("revResult").innerHTML=`<div class="revScore">Last revision score: ${rs.score}%</div><div class="small">Recorded ${escapeHtml(rs.date)}</div>`;
+    else document.getElementById("revResult").innerHTML="";
+    renderRevision();
+  }catch(e){document.getElementById("revisionSelected").innerHTML=`<div class="notice error">Revision text could not be loaded: ${escapeHtml(e.message)}</div>`;}
+}
+function renderRevision(){
+  const due=dueReviews(), weak=Object.entries(state.weak).sort((a,b)=>b[1].count-a[1].count), six=revisionHistory();
+  let html="";
+  if(six.length){
+    html=six.map((x,i)=>{
+      const rs=revisionScoreFor(x.key);
+      const selected=revisionSelected?.key===x.key?"selected":"";
+      const revBadge=rs?`<span class="badge">Revision: ${rs.score}%</span>`:`<span class="badge warn">Not tested yet</span>`;
+      return `<div class="revCard ${selected}"><div class="row"><span><strong>${escapeHtml(x.key)}</strong><br><span class="small">Learned ${escapeHtml(x.date)} • New-lesson score ${x.score}%</span></span><span class="badge ${x.score>=90?"":"warn"}">${x.score}%</span></div><div class="actions" style="margin-top:8px"><button class="secondary" data-rev-select="${encodeURIComponent(x.key)}">📖 Open & test</button>${revBadge}</div></div>`;
+    }).join("");
+  } else {
+    html=`<div class="notice">No six completed lessons are available yet. Complete new lessons first; they will automatically appear here.</div>`;
+  }
+  if(due.length)html+=`<h3 style="margin-top:18px">Spaced-repetition due today</h3>`+due.map(x=>`<div class="row"><span><strong>${escapeHtml(x.key)}</strong><br><span class="small">${x.stage===0?"Same day":x.stage+"-day review"}</span></span><span class="badge warn">Due</span></div>`).join("");
+  if(weak.length)html+=`<h3 style="margin-top:18px">Mistake Bank</h3>`+weak.map(([k,v])=>`<div class="row"><span>${escapeHtml(k)}<br><span class="small">Last: ${v.last||""}</span></span><span class="badge bad">${v.count} weak</span></div>`).join("");
+  document.getElementById("revisionLessons").innerHTML=html;
+  document.querySelectorAll('[data-rev-select]').forEach(b=>b.onclick=()=>selectRevision(decodeURIComponent(b.dataset.revSelect)));
+}
+function initRevisionRecognition(){
+  if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){document.getElementById("revStatus").textContent="Speech recognition is not supported in this browser.";return;}
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition; revisionRecognition=new R(); revisionRecognition.lang="ar-SA"; revisionRecognition.interimResults=true; revisionRecognition.continuous=true; revisionRecognition.maxAlternatives=1;
+  revisionRecognition.onstart=()=>{revisionTranscript="";revisionInterim="";revisionStopRequested=false;revisionScored=false;document.getElementById("revStatus").textContent="Listening… recite the selected revision lesson without looking.";document.getElementById("revResult").innerHTML="";document.getElementById("revCompare").innerHTML="";};
+  revisionRecognition.onresult=e=>{let f="",it="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0]?.transcript||"";if(e.results[i].isFinal)f+=" "+t;else it+=" "+t;}if(f.trim())revisionTranscript=(revisionTranscript+" "+f).trim();revisionInterim=it.trim();const live=(revisionTranscript+" "+revisionInterim).trim();if(live&&revisionExpectedText){const d=tokenDiff(revisionExpectedText,live);document.getElementById("revResult").innerHTML=`<div class="revScore">${d.score}% approximate match${revisionStopRequested?" — score ready":" — live"}</div><div class="small">Heard: ${escapeHtml(live)}</div>`;document.getElementById("revCompare").innerHTML=d.matched.map(x=>`<span class="word ${x.status==="ok"?"okw":"miss"}" dir="rtl">${escapeHtml(x.w)}</span>`).join("")+d.extras.map(x=>`<span class="word extra" dir="rtl">+${escapeHtml(x)}</span>`).join("");}};
+  revisionRecognition.onerror=e=>{document.getElementById("revStatus").textContent="Recognition error: "+(e.error||"unknown");};
+  revisionRecognition.onend=()=>{if(revisionStopRequested&&!revisionScored)finalizeRevisionScore();else if(!revisionStopRequested&&document.getElementById("revStatus").textContent.startsWith("Listening"))document.getElementById("revStatus").textContent="Recognition service ended. Press Start revision again if needed.";};
+}
+function finalizeRevisionScore(){
+  const heard=(revisionTranscript+" "+revisionInterim).trim();
+  if(!heard||!revisionSelected||!revisionExpectedText){document.getElementById("revStatus").textContent="No speech result was returned. No revision score was recorded.";return;}
+  if(revisionScored)return;
+  const d=tokenDiff(revisionExpectedText,heard); revisionScored=true;
+  const entry={date:iso(todayDate()),key:revisionSelected.key,score:d.score,actual:0,type:"Revision self-test",label:"Revision score",source:"speech",revision:true,heard};
+  state.history.push(entry);pushDayResult(entry.date,entry);save();
+  document.getElementById("revStatus").textContent="Revision test complete — score recorded. New-learning progress was not changed.";
+  document.getElementById("revResult").innerHTML=`<div class="revScore">${d.score}% approximate match</div><div class="small">Heard: ${escapeHtml(heard)}</div><div class="small">${d.matched.filter(x=>x.status==="ok").length} expected words matched • ${d.matched.filter(x=>x.status==="miss").length} missing • ${d.extras.length} extra</div>`;
+  document.getElementById("revCompare").innerHTML=d.matched.map(x=>`<span class="word ${x.status==="ok"?"okw":"miss"}" dir="rtl">${escapeHtml(x.w)}</span>`).join("")+d.extras.map(x=>`<span class="word extra" dir="rtl">+${escapeHtml(x)}</span>`).join("");
+  renderRevision();
+}
+initRevisionRecognition();
+document.getElementById("revStartRec").onclick=()=>{if(!revisionSelected||!revisionExpectedText){document.getElementById("revStatus").textContent="Select a revision lesson first.";return}if(!revisionRecognition){document.getElementById("revStatus").textContent="Speech recognition is not supported in this browser.";return}try{revisionStopRequested=false;revisionRecognition.start()}catch(e){document.getElementById("revStatus").textContent="Recognition is already running. Press Stop & score first.";}};
+document.getElementById("revStopRec").onclick=()=>{if(revisionRecognition){revisionStopRequested=true;document.getElementById("revStatus").textContent="Stopping… finalizing revision score…";try{revisionRecognition.stop()}catch(e){}}};
+document.getElementById("revListenBtn").onclick=async()=>{if(!revisionAudioRefs.length){document.getElementById("revAudioStatus").textContent="Select a revision lesson first.";return}revisionAudioIndex=0;const a=revisionAudioRefs[revisionAudioIndex],p=document.getElementById("player");p.pause();p.src=a.url;p.load();try{await p.play();document.getElementById("revAudioStatus").textContent=`Playing ${a.ref} • ${revisionAudioIndex+1}/${revisionAudioRefs.length}`;}catch(e){document.getElementById("revAudioStatus").textContent="Tap Listen again if the browser blocks automatic audio.";}};
+document.getElementById("revStopAudio").onclick=()=>{const p=document.getElementById("player");p.pause();p.currentTime=0;document.getElementById("revAudioStatus").textContent="Audio stopped."};
 function renderProgress(){
   const pct=(state.strongLines/totalLearningLines*100).toFixed(1),loc=cursorToLoc(state.cursor);
   document.getElementById("healthBox").innerHTML=`
@@ -567,90 +593,15 @@ function renderProgress(){
     <div class="row"><span>Friday</span><strong>Protected revision/test</strong></div>
     <div class="row"><span>Month-end</span><strong>Protected monthly test</strong></div>`;
 }
-function saveResult(){
-  const resultType=document.getElementById("resultType").value;
-  const isPractice=resultType==="Practice only";
-  const confirmed=document.getElementById("confirmTestDone").checked;
-  const scoreRaw=document.getElementById("scoreInput").value.trim();
-  const actualRaw=document.getElementById("actualLinesInput").value.trim();
-  const planned=Math.max(0,currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0);
-  const date=iso(todayDate());
-
-  if(!state.startDate){
-    document.getElementById("resultMsg").textContent="Choose a Hifz start date first.";
-    return;
-  }
-  if(currentTask?.type==="Before start" || currentTask?.type==="Setup required"){
-    document.getElementById("resultMsg").textContent="The Hifz schedule has not started yet. Nothing was saved.";
-    return;
-  }
-  if(state.results?.[date]){
-    document.getElementById("resultMsg").textContent="Today's result is already saved. The schedule will not advance twice.";
-    return;
-  }
-
-  /* Practice-only notes never change Hifz progress. */
-  if(isPractice){
-    const entry={date,label:"Practice logged — no Hifz progress changed",key:currentTask?.target||`P${currentPage}`,score:null,actual:0,type:resultType,note:document.getElementById("resultNote").value};
-    state.history.push(entry);
-    /* Practice is deliberately NOT stored in results: it must never make the lesson look completed. */
-    save();renderAll();renderSchedule();
-    document.getElementById("resultMsg").textContent="Practice logged only. Progress, Strong/Weak status, and schedule were NOT changed.";
-    return;
-  }
-
-  if(!confirmed){
-    document.getElementById("resultMsg").textContent="Nothing was saved. First recite/test the lesson, then tick “I actually recited/tested this lesson.” Listening to audio alone does not count.";
-    return;
-  }
-  if(scoreRaw==="" || actualRaw===""){
-    document.getElementById("resultMsg").textContent="Enter the actual test score and actual lines completed before saving.";
-    return;
-  }
-
-  const score=clamp(Number(scoreRaw),0,100);
-  let actual=clamp(Number(actualRaw),0,planned+20);
-  const key=currentTask?.target||`P${currentPage}`;
-  const isNewLesson=currentTask?.type==="New lesson";
-  const isRevision=currentTask?.type?.toLowerCase().includes("revision") || currentTask?.type?.toLowerCase().includes("test");
-  let label=score<75?"Not passed — repeat / carry forward":score<90?"Passed — extra revision":"Strong — advance";
-
-  const entry={date,label,key,score,actual,type:resultType,note:document.getElementById("resultNote").value};
-  state.history.push(entry);
-  state.results[date]=entry;
-
-  if(isNewLesson){
-    if(score>=75 && actual>0){
-      const startCursor=state.cursor;
-      state.cursor=Math.min(totalLearningLines+1,state.cursor+actual);
-      state.passedLines=Math.min(totalLearningLines,state.passedLines+actual);
-      if(score>=90)state.strongLines=Math.min(totalLearningLines,state.strongLines+actual);
-      const loc=cursorToLoc(startCursor);
-      const endLoc=cursorToLoc(Math.max(startCursor,state.cursor-1));
-      const reviewKey=`P${loc.page} L${loc.line}–P${endLoc.page} L${endLoc.line}`;
-      state.lessons[reviewKey]={key:reviewKey,learnedAt:date,reviewDates:[date,iso(addDays(todayDate(),1)),iso(addDays(todayDate(),7)),iso(addDays(todayDate(),30))]};
-    }else{
-      state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date;
-    }
-  }else if(isRevision){
-    if(score<75){state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date;}
-    /* Revision/test never advances the new-learning cursor. */
-  }
-
-  if(state.lastDate!==date){
-    state.streak=(state.lastDate&&Math.abs(new Date(date)-new Date(state.lastDate))===86400000)?(state.streak||0)+1:1;
-    state.lastDate=date;
-  }
-  save();renderAll();renderSchedule();
-  document.getElementById("resultMsg").textContent=isNewLesson
-    ? label+" • saved from your actual test; the next learning day is now recalculated from your verified progress."
-    : "Test saved. Revision/test does not advance the new-learning cursor.";
-}
-document.getElementById("saveResult").onclick=saveResult;
+function promptNextLessonToday(label,score){const p=document.getElementById("nextLessonPrompt"),btn=document.getElementById("continueTodayBtn"),fin=document.getElementById("finishTodayBtn");if(score>=75){p.classList.remove("hidden");p.innerHTML=`<strong>${label}</strong><br>Your lesson is finished. Continue with another new lesson today, or finish for today?`;btn.classList.remove("hidden");fin.classList.remove("hidden")}else{p.classList.add("hidden");btn.classList.add("hidden");fin.classList.add("hidden")}}
+function advanceToNextLessonToday(){const r=activeRow();if(r.type!=="New lesson"||!r.segments?.length){document.getElementById("resultMsg").textContent="There is no additional new lesson available today. Friday remains protected for revision/test.";return}currentTask=r;currentPage=r.segments[0].page;document.getElementById("nextLessonPrompt").classList.add("hidden");document.getElementById("continueTodayBtn").classList.add("hidden");document.getElementById("finishTodayBtn").classList.add("hidden");setTab("lesson")}
+function finishToday(){document.getElementById("nextLessonPrompt").classList.add("hidden");document.getElementById("continueTodayBtn").classList.add("hidden");document.getElementById("finishTodayBtn").classList.add("hidden");document.getElementById("resultMsg").textContent="Finished for today. Your verified progress is saved; tomorrow's lesson will be calculated from it."}
+function saveResult(){const resultType=document.getElementById("resultType").value,isPractice=resultType==="Practice only",confirmed=document.getElementById("confirmTestDone").checked,scoreRaw=document.getElementById("scoreInput").value.trim(),actualRaw=document.getElementById("actualLinesInput").value.trim(),planned=Math.max(0,currentTask?.segments?.reduce((n,x)=>n+(x.end-x.start+1),0)||0),date=iso(todayDate());if(!state.startDate){document.getElementById("resultMsg").textContent="Choose a Hifz start date first.";return}if(currentTask?.type==="Before start"||currentTask?.type==="Setup required"){document.getElementById("resultMsg").textContent="The Hifz schedule has not started yet. Nothing was saved.";return}if(isPractice){const entry={date,label:"Practice logged — no Hifz progress changed",key:currentTask?.target||`P${currentPage}`,score:null,actual:0,type:resultType,note:document.getElementById("resultNote").value};state.history.push(entry);pushDayResult(date,entry);save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent="Practice logged only. Progress, Strong/Weak status, and schedule were NOT changed.";return}if(!confirmed){document.getElementById("resultMsg").textContent="Nothing was saved. First recite/test the lesson, then tick “I actually recited/tested this lesson.” Listening to audio alone does not count.";return}if(scoreRaw===""||actualRaw===""){document.getElementById("resultMsg").textContent="Enter the actual test score and actual lines completed before saving.";return}const score=clamp(Number(scoreRaw),0,100),actual=clamp(Number(actualRaw),1,planned+20),key=currentTask?.target||`P${currentPage}`,isNewLesson=currentTask?.type==="New lesson",isRevision=currentTask?.type?.toLowerCase().includes("revision")||currentTask?.type?.toLowerCase().includes("test"),label=score<75?"Not passed — repeat / carry forward":score<90?"Passed — extra revision":"Strong — advance",entry={date,label,key,score,actual,type:resultType,note:document.getElementById("resultNote").value,source:"speech/manual",lessonKind:isNewLesson?"new":"test",refs:currentLessonRefs.slice(),segments:(currentTask?.segments||[]).map(x=>({...x}))};state.history.push(entry);pushDayResult(date,entry);if(isNewLesson){if(score>=75){const startCursor=state.cursor,advance=Math.min(actual,planned);state.cursor=Math.min(totalLearningLines+1,state.cursor+advance);state.passedLines=Math.min(totalLearningLines,state.passedLines+advance);if(score>=90)state.strongLines=Math.min(totalLearningLines,state.strongLines+advance);const loc=cursorToLoc(startCursor),endLoc=cursorToLoc(Math.max(startCursor,state.cursor-1)),reviewKey=`P${loc.page} L${loc.line}–P${endLoc.page} L${endLoc.line}`;state.lessons[reviewKey]={key:reviewKey,learnedAt:date,reviewDates:[date,iso(addDays(todayDate(),1)),iso(addDays(todayDate(),7)),iso(addDays(todayDate(),30))]}}else{state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date}}else if(isRevision&&score<75){state.weak[key]=state.weak[key]||{count:0};state.weak[key].count++;state.weak[key].last=date}if(state.lastDate!==date){const prev=state.lastDate?parseLocalDate(state.lastDate):null;state.streak=(prev&&iso(addDays(prev,1))===date)?(state.streak||0)+1:1;state.lastDate=date}save();renderAll();renderSchedule();document.getElementById("resultMsg").textContent=isNewLesson?`${label} • ${score}% saved. ${score>=75?"Your verified progress advanced; choose whether to continue today.":"This lesson stays unadvanced and carries forward."}`:"Test saved. Revision/test does not advance the new-learning cursor.";if(isNewLesson)promptNextLessonToday(label,score)}
+document.getElementById("saveResult").onclick=saveResult;document.getElementById("continueTodayBtn").onclick=advanceToNextLessonToday;document.getElementById("finishTodayBtn").onclick=finishToday;
 
 document.getElementById("openLesson").onclick=()=>setTab("lesson");
 document.getElementById("openRevision").onclick=()=>setTab("revision");
-document.getElementById("exportBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="quran-hifz-progress-v4.json";a.click()};
+document.getElementById("exportBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="quran-hifz-progress-v10.json";a.click()};
 document.getElementById("resetBtn").onclick=()=>{if(confirm("Reset all local progress?")){localStorage.removeItem(STORAGE);location.reload()}};
 
 
